@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Batch {{ batch.id }} - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Batch Details</h1>
+    <p class="text-gray-600 mt-2">{{ batch.id }}</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Batch Info -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Batch Information</h2>
+        <dl class="space-y-3">
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Batch ID</dt>
+                <dd class="text-sm text-gray-900 font-mono">{{ batch.id }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Item</dt>
+                <dd class="text-sm text-gray-900">{{ batch.item_id }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                <dd class="text-sm">
+                    {% if batch.status == 'active' %}
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Active</span>
+                    {% elif batch.status == 'depleted' %}
+                        <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs font-medium">Depleted</span>
+                    {% else %}
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">{{ batch.status }}</span>
+                    {% endif %}
+                </dd>
+            </div>
+            {% if batch.quantity %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Quantity</dt>
+                <dd class="text-sm text-gray-900">{{ batch.quantity.amount }} {{ batch.quantity.unit }}</dd>
+            </div>
+            {% endif %}
+            {% if batch.production_date %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Production Date</dt>
+                <dd class="text-sm text-gray-900">{{ batch.production_date }}</dd>
+            </div>
+            {% endif %}
+            {% if batch.expiration_date %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Expiration Date</dt>
+                <dd class="text-sm text-gray-900">{{ batch.expiration_date }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+
+    <!-- Metadata -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Metadata</h2>
+        <dl class="space-y-3">
+            {% if batch.location_id %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Location</dt>
+                <dd class="text-sm text-gray-900">{{ batch.location_id }}</dd>
+            </div>
+            {% endif %}
+            {% if batch.origin_kind %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Origin</dt>
+                <dd class="text-sm text-gray-900">{{ batch.origin_kind }}</dd>
+            </div>
+            {% endif %}
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Created</dt>
+                <dd class="text-sm text-gray-900">{{ batch.created_at }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Schema</dt>
+                <dd class="text-sm text-gray-900 font-mono">{{ batch.schema }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
+
+<!-- Related Events -->
+<div class="bg-white rounded-lg shadow p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Traceability</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Upstream -->
+        <div>
+            <h3 class="font-medium text-gray-700 mb-3">📥 Upstream (Inputs)</h3>
+            {% if upstream %}
+            <div class="space-y-2">
+                {% for input in upstream %}
+                <div class="border border-gray-200 rounded p-3">
+                    <a href="/actors/{{ actor_id }}/batches/{{ input.batch_id }}" 
+                       class="font-mono text-sm text-green-600 hover:underline">
+                        {{ input.batch_id }}
+                    </a>
+                    <div class="text-xs text-gray-500 mt-1">
+                        {{ input.item_id }} - 
+                        {% if input.amount %}{{ input.amount.amount }} {{ input.amount.unit }}{% else %}N/A{% endif %}
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1">
+                        Status: {{ input.status }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-sm text-gray-500">No upstream batches (this is an origin batch)</p>
+            {% endif %}
+        </div>
+        
+        <!-- Downstream -->
+        <div>
+            <h3 class="font-medium text-gray-700 mb-3">📤 Downstream (Outputs)</h3>
+            {% if downstream %}
+            <div class="space-y-2">
+                {% for output in downstream %}
+                <div class="border border-gray-200 rounded p-3">
+                    <a href="/actors/{{ actor_id }}/batches/{{ output.batch_id }}" 
+                       class="font-mono text-sm text-green-600 hover:underline">
+                        {{ output.batch_id }}
+                    </a>
+                    <div class="text-xs text-gray-500 mt-1">
+                        {{ output.item_id }} - 
+                        {% if output.amount %}{{ output.amount.amount }} {{ output.amount.unit }}{% else %}N/A{% endif %}
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1">
+                        Status: {{ output.status }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-sm text-gray-500">No downstream batches yet</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Related Events -->
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">Related Events</h2>
+    {% if events %}
+    <div class="space-y-4">
+        {% for event in events %}
+        <div class="border border-gray-200 rounded p-4">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <span class="font-mono text-sm text-gray-900">{{ event.id }}</span>
+                    <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{{ event.event_type }}</span>
+                </div>
+                <span class="text-sm text-gray-500">{{ event.timestamp }}</span>
+            </div>
+            {% if event.notes %}
+            <p class="text-sm text-gray-600">{{ event.notes }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-500">No events recorded for this batch yet.</p>
+    {% endif %}
+</div>
+
+<!-- Actions -->
+<div class="mt-8 flex space-x-4">
+    <a href="/actors/{{ actor_id }}/batches" 
+       class="text-green-600 hover:underline">
+        ← Back to Batches
+    </a>
+    <a href="/actors/{{ actor_id }}/traceability/batch/{{ batch.id }}" 
+       class="text-blue-600 hover:underline">
+        View Traceability Graph →
+    </a>
+</div>
+{% endblock %}

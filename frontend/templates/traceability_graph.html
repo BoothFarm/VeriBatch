@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Traceability Graph - {{ batch.id }} - OriginStack{% endblock %}
+
+{% block content %}
+
+<!-- Macro to render tree recursively - MUST BE DEFINED BEFORE USE -->
+{% macro render_tree(node, depth) %}
+<div class="{% if depth > 0 %}ml-6 border-l-2 border-gray-300 pl-4 mt-2{% endif %}">
+    <div class="{% if depth == 0 %}font-bold text-green-700{% else %}text-gray-700{% endif %}">
+        {% for i in range(depth) %}│ {% endfor %}
+        {% if depth > 0 %}├─ {% endif %}
+        <a href="/actors/{{ actor_id }}/batches/{{ node.batch_id }}" 
+           class="hover:underline">
+            {{ node.batch_id }}
+        </a>
+        <span class="text-gray-500">
+            ({{ node.item_id }}{% if node.quantity %}, {{ node.quantity.amount }} {{ node.quantity.unit }}{% endif %})
+        </span>
+        <span class="text-xs px-2 py-0.5 {% if node.status == 'active' %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-600{% endif %} rounded">
+            {{ node.status }}
+        </span>
+    </div>
+    
+    {% if node.inputs %}
+    <div class="text-xs text-gray-500 ml-2 mt-1">
+        {{ node.inputs|length }} input(s):
+    </div>
+    {% for input in node.inputs %}
+        {% if input.batch %}
+        {{ render_tree(input.batch, depth + 1) }}
+        {% endif %}
+    {% endfor %}
+    {% elif depth > 0 %}
+    <div class="ml-6 text-xs text-gray-400 mt-1">
+        └─ Origin ({{ node.get('origin_kind', 'unknown') }})
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Traceability Graph</h1>
+    <p class="text-gray-600 mt-2">Full dependency tree for {{ batch.id }}</p>
+</div>
+
+<!-- Batch Summary -->
+<div class="bg-white rounded-lg shadow p-6 mb-8">
+    <div class="flex items-start justify-between">
+        <div>
+            <h2 class="text-xl font-semibold">{{ batch.id }}</h2>
+            <p class="text-gray-600">{{ batch.item_id }}</p>
+        </div>
+        <div class="text-right">
+            {% if batch.quantity %}
+            <div class="text-sm text-gray-600">{{ batch.quantity.amount }} {{ batch.quantity.unit }}</div>
+            {% endif %}
+            <div class="mt-1">
+                {% if batch.status == 'active' %}
+                <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Active</span>
+                {% elif batch.status == 'depleted' %}
+                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">Depleted</span>
+                {% else %}
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">{{ batch.status }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Traceability Tree -->
+<div class="bg-white rounded-lg shadow p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Dependency Tree</h2>
+    <p class="text-sm text-gray-600 mb-6">
+        This shows all batches that contributed to making <strong>{{ batch.id }}</strong>, 
+        recursively following the supply chain back to origin.
+    </p>
+    
+    <div class="font-mono text-sm">
+        {{ render_tree(graph, 0) }}
+    </div>
+</div>
+
+<!-- Explanation -->
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="font-semibold text-blue-900 mb-2">📊 Reading the Tree</h3>
+    <ul class="text-blue-800 text-sm space-y-2">
+        <li><strong>Top node:</strong> The batch you're viewing ({{ batch.id }})</li>
+        <li><strong>Each level down:</strong> Batches that were used as inputs</li>
+        <li><strong>Leaf nodes:</strong> Origin batches (harvested, received, etc.) with no further inputs</li>
+        <li><strong>Depth:</strong> Number of processing steps from origin</li>
+    </ul>
+</div>
+
+<!-- Actions -->
+<div class="mt-8 flex gap-4">
+    <a href="/actors/{{ actor_id }}/batches/{{ batch.id }}" 
+       class="text-green-600 hover:underline">
+        View Batch Details →
+    </a>
+    <a href="/actors/{{ actor_id }}/traceability" 
+       class="text-green-600 hover:underline">
+        ← Back to Traceability Explorer
+    </a>
+    <a href="/api/actors/{{ actor_id }}/traceability/batches/{{ batch.id }}/graph" 
+       class="text-blue-600 hover:underline"
+       target="_blank">
+        View Raw JSON →
+    </a>
+</div>
+
+{% endblock %}

@@ -75,22 +75,22 @@ GET    /actors/{id}/locations/{id} # Get location
 
 ```bash
 # 1. Create actor
-curl -X POST http://localhost:8000/actors \
+curl -X POST http://localhost:8000/api/actors \
   -H "Content-Type: application/json" \
   -d '{"id":"farm1","name":"My Farm","kind":"producer"}'
 
 # 2. Create item
-curl -X POST http://localhost:8000/actors/farm1/items \
+curl -X POST http://localhost:8000/api/actors/farm1/items \
   -H "Content-Type: application/json" \
   -d '{"id":"tomatoes","name":"Tomatoes","category":"raw_material","unit":"kg"}'
 
 # 3. Create batch
-curl -X POST http://localhost:8000/actors/farm1/batches \
+curl -X POST http://localhost:8000/api/actors/farm1/batches \
   -H "Content-Type: application/json" \
   -d '{"id":"batch-001","item_id":"tomatoes","quantity":{"amount":50,"unit":"kg"},"production_date":"2025-01-15"}'
 
 # 4. List batches
-curl http://localhost:8000/actors/farm1/batches
+curl http://localhost:8000/api/actors/farm1/batches
 ```
 
 ## OOJ Required Fields
@@ -118,8 +118,8 @@ curl http://localhost:8000/actors/farm1/batches
 
 ## Interactive Docs
 
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- Swagger UI: http://localhost:8000/api/docs
+- ReDoc: http://localhost:8000/api/redoc
 
 ## Troubleshooting
 

@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Merge Batches - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">🔗 Merge Batches</h1>
+    <p class="text-gray-600 mt-2">Combine multiple batches into one larger batch</p>
+</div>
+
+<!-- Helper -->
+<div class="max-w-4xl mb-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="font-semibold text-blue-900 mb-2">💡 When to merge batches?</h3>
+        <ul class="text-blue-800 text-sm space-y-1">
+            <li>• <strong>Bulk processing:</strong> Combine small harvests for larger production runs</li>
+            <li>• <strong>Quality consistency:</strong> Mix batches with similar quality/grade</li>
+            <li>• <strong>Efficiency:</strong> Reduce inventory complexity by consolidating</li>
+            <li>• <strong>Packaging:</strong> Combine partial batches into full packaging runs</li>
+        </ul>
+    </div>
+</div>
+
+<div class="max-w-4xl">
+    <form method="POST" action="/actors/{{ actor_id }}/merge-batch/create" class="bg-white rounded-xl shadow-lg p-8">
+        
+        <!-- Basic Info -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Merge Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Event ID -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Merge ID *
+                    </label>
+                    <input type="text" name="event_id" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                           placeholder="e.g., MERGE-2025-001"
+                           required>
+                    <p class="text-sm text-gray-500 mt-1">Unique ID for this merge operation</p>
+                </div>
+
+                <!-- Output Batch ID -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        New Combined Batch ID *
+                    </label>
+                    <input type="text" name="output_batch_id" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                           placeholder="e.g., COMBINED-HARVEST-001"
+                           required>
+                    <p class="text-sm text-gray-500 mt-1">ID for the new merged batch</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Batches -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">📥 Batches to Merge</h2>
+            
+            <div id="inputs-container">
+                <!-- First input -->
+                <div class="input-row bg-red-50 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batch to Merge *</label>
+                            <select name="inputs[0][batch_id]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose batch to merge...</option>
+                                {% for batch in available_batches %}
+                                <option value="{{ batch.id }}">{{ batch.id }} - {{ batch.item_id }} ({{ batch.quantity.amount if batch.quantity }} {{ batch.quantity.unit if batch.quantity }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="bg-gray-100 p-3 rounded">
+                                <p class="text-sm text-gray-600">
+                                    <strong>📋 Entire batch will be used</strong><br>
+                                    Merge combines complete batches only. Select the batch above and the entire quantity will be merged.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second input -->
+                <div class="input-row bg-red-50 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batch to Merge *</label>
+                            <select name="inputs[1][batch_id]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose batch to merge...</option>
+                                {% for batch in available_batches %}
+                                <option value="{{ batch.id }}">{{ batch.id }} - {{ batch.item_id }} ({{ batch.quantity.amount if batch.quantity }} {{ batch.quantity.unit if batch.quantity }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="bg-gray-100 p-3 rounded">
+                                <p class="text-sm text-gray-600">
+                                    <strong>📋 Entire batch will be used</strong><br>
+                                    Merge combines complete batches only. Select the batch above and the entire quantity will be merged.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" onclick="addInput()" class="text-green-600 hover:text-green-700 font-medium">
+                + Add Another Batch to Merge
+            </button>
+            
+            <div class="mt-4 text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <strong>⚠️ Important:</strong> 
+                <ul class="mt-1 space-y-1">
+                    <li>• All batches must be of the same product type</li>
+                    <li>• Complete batches will be merged (not partial amounts)</li>
+                    <li>• Source batches will be marked as "depleted" after merge</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Output Details -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">📤 Combined Batch Details</h2>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="font-semibold text-blue-900 mb-2">✨ Automatic Calculation</h4>
+                <ul class="text-blue-800 text-sm space-y-1">
+                    <li>• <strong>Product Type:</strong> Detected from input batches (must all match)</li>
+                    <li>• <strong>Total Amount:</strong> Sum of all input batch quantities</li>
+                    <li>• <strong>Unit:</strong> Same as input batches</li>
+                </ul>
+                <p class="text-blue-800 text-sm mt-2">
+                    The system will automatically calculate the combined batch details based on your selected input batches.
+                </p>
+            </div>
+        </div>
+
+        <!-- Optional Fields -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Additional Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Location -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Where Merged?
+                    </label>
+                    <select name="location_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Location not tracked</option>
+                        {% for location in locations %}
+                        <option value="{{ location.id }}">{{ location.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Performed By -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Merged By
+                    </label>
+                    <input type="text" name="performed_by" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                           placeholder="Your name">
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="mb-8">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Merge Notes (Optional)
+            </label>
+            <textarea name="notes" rows="3" 
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="e.g., Combined small harvests for bulk processing, similar quality grades mixed for consistency, etc."></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="border-t border-gray-200 pt-6">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="flex-1 bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-md">
+                    🔗 Merge These Batches
+                </button>
+                <a href="/actors/{{ actor_id }}/batches" 
+                   class="flex-1 text-center bg-gray-100 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- What Happens Next -->
+<div class="max-w-4xl mt-8">
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 class="font-semibold text-green-900 mb-2">🎯 What happens when you merge?</h3>
+        <ul class="text-green-800 text-sm space-y-1">
+            <li>• <strong>Input batches marked as "depleted"</strong> - they've been consumed in the merge</li>
+            <li>• <strong>New combined batch created</strong> with the total amount</li>
+            <li>• <strong>Full traceability maintained</strong> - new batch links back to all input batches</li>
+            <li>• <strong>Merge event recorded</strong> for audit trail</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+let inputCount = 2; // Start at 2 since we have 2 initial inputs
+
+function addInput() {
+    const container = document.getElementById('inputs-container');
+    const newInput = document.createElement('div');
+    newInput.className = 'input-row bg-red-50 rounded-lg p-4 mb-4';
+    newInput.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Batch to Merge *</label>
+                <select name="inputs[${inputCount}][batch_id]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <option value="">Choose batch to merge...</option>
+                    {% for batch in available_batches %}
+                    <option value="{{ batch.id }}">{{ batch.id }} - {{ batch.item_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Amount to Use *</label>
+                <div class="bg-gray-100 p-3 rounded">
+                    <p class="text-sm text-gray-600">
+                        <strong>📋 Entire batch will be used</strong><br>
+                        Complete batch will be merged automatically.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="removeInput(this)" class="mt-2 text-red-600 hover:text-red-700 text-sm">Remove</button>
+    `;
+    container.appendChild(newInput);
+    inputCount++;
+}
+
+function removeInput(button) {
+    button.parentElement.remove();
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Record Production Run - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">🏭 Record Production Run</h1>
+    <p class="text-gray-600 mt-2">Turn ingredients into finished products with full traceability</p>
+</div>
+
+<!-- Example Helper -->
+<div class="max-w-4xl mb-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="font-semibold text-blue-900 mb-2">💡 What's a production run?</h3>
+        <p class="text-blue-800 text-sm mb-2">
+            Any time you take ingredients/materials and make something new. Examples:
+        </p>
+        <ul class="text-blue-800 text-sm space-y-1">
+            <li>• <strong>Pickled Garlic:</strong> Fresh garlic + vinegar + jars → Pickled garlic jars</li>
+            <li>• <strong>Bread:</strong> Flour + yeast + water → Loaves of bread</li>
+            <li>• <strong>Salad Mix:</strong> Lettuce + spinach + herbs → Packaged salad</li>
+        </ul>
+    </div>
+</div>
+
+<div class="max-w-4xl">
+    <form method="POST" action="/actors/{{ actor_id }}/production-run/create" class="bg-white rounded-xl shadow-lg p-8">
+        
+        <!-- Basic Info -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Production Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Event ID -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Production ID *
+                    </label>
+                    <input type="text" name="event_id" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                           placeholder="e.g., PROD-2025-001"
+                           required>
+                    <p class="text-sm text-gray-500 mt-1">Unique ID for this production run</p>
+                </div>
+
+                <!-- Process/Recipe -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Recipe/Process (Optional)
+                    </label>
+                    <select name="process_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">No specific recipe</option>
+                        {% for process in processes %}
+                        <option value="{{ process.id }}">{{ process.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-sm text-gray-500 mt-1">
+                        {% if not processes %}
+                        <a href="/actors/{{ actor_id }}/processes/new" class="text-green-600 hover:underline">Create a recipe first</a> if you want to track your standard procedures
+                        {% else %}
+                        Link to your saved recipes/SOPs
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Location -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Where Made?
+                    </label>
+                    <select name="location_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Location not tracked</option>
+                        {% for location in locations %}
+                        <option value="{{ location.id }}">{{ location.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Performed By -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Made By
+                    </label>
+                    <input type="text" name="performed_by" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                           placeholder="Your name or employee name">
+                </div>
+            </div>
+        </div>
+
+        <!-- Inputs Section -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">📥 What Did You Use? (Inputs)</h2>
+            
+            <div id="inputs-container">
+                <div class="input-row bg-gray-50 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batch Used *</label>
+                            <select name="inputs[0][batch_id]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose input batch...</option>
+                                {% for batch in available_batches %}
+                                <option value="{{ batch.id }}">{{ batch.id }} - {{ batch.item_id }} ({{ batch.quantity.amount if batch.quantity }} {{ batch.quantity.unit if batch.quantity }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Amount Used *</label>
+                            <input type="number" name="inputs[0][amount][amount]" step="0.01" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                   placeholder="5" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                            <select name="inputs[0][amount][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose unit...</option>
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                                <option value="L">L</option>
+                                <option value="gal">gal</option>
+                                <option value="units">units</option>
+                                <option value="jars">jars</option>
+                                <option value="cases">cases</option>
+                                <option value="dozen">dozen</option>
+                                <option value="boxes">boxes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" onclick="addInput()" class="text-green-600 hover:text-green-700 font-medium">
+                + Add Another Input
+            </button>
+        </div>
+
+        <!-- Outputs Section -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">📤 What Did You Make? (Outputs)</h2>
+            
+            <div id="outputs-container">
+                <div class="output-row bg-green-50 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">New Batch ID *</label>
+                            <input type="text" name="outputs[0][batch_id]" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                                   placeholder="e.g., PG-2025-001" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Type *</label>
+                            <select name="outputs[0][item_id]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose product...</option>
+                                {% for item in items %}
+                                <option value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Amount Made *</label>
+                            <input type="number" name="outputs[0][amount][amount]" step="0.01" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                   placeholder="24" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                            <select name="outputs[0][amount][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose unit...</option>
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                                <option value="L">L</option>
+                                <option value="gal">gal</option>
+                                <option value="units">units</option>
+                                <option value="jars">jars</option>
+                                <option value="cases">cases</option>
+                                <option value="dozen">dozen</option>
+                                <option value="boxes">boxes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" onclick="addOutput()" class="text-green-600 hover:text-green-700 font-medium">
+                + Add Another Output
+            </button>
+        </div>
+
+        <!-- Notes -->
+        <div class="mb-8">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Production Notes (Optional)
+            </label>
+            <textarea name="notes" rows="3" 
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="e.g., Used recipe v2.1, processed for 2 hours, organic vinegar, etc."></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="border-t border-gray-200 pt-6">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="flex-1 bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-md">
+                    🏭 Record This Production Run
+                </button>
+                <a href="/actors/{{ actor_id }}/batches" 
+                   class="flex-1 text-center bg-gray-100 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition">
+                    Cancel
+                </a>
+            </div>
+            
+            <p class="text-sm text-gray-500 text-center mt-4">
+                💡 This will create new output batches and link them to your input ingredients
+            </p>
+        </div>
+    </form>
+</div>
+
+<!-- What Happens Next -->
+<div class="max-w-4xl mt-8">
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 class="font-semibold text-green-900 mb-2">🎯 What happens when you submit?</h3>
+        <ul class="text-green-800 text-sm space-y-1">
+            <li>• <strong>New batches created</strong> for your finished products</li>
+            <li>• <strong>Input batches updated</strong> to show how much was used</li>
+            <li>• <strong>Full traceability link</strong> from ingredients to finished goods</li>
+            <li>• <strong>Production event logged</strong> for compliance records</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+let inputCount = 1;
+let outputCount = 1;
+
+function addInput() {
+    const container = document.getElementById('inputs-container');
+    const newInput = document.createElement('div');
+    newInput.className = 'input-row bg-gray-50 rounded-lg p-4 mb-4';
+    newInput.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Batch Used *</label>
+                <select name="inputs[${inputCount}][batch_id]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <option value="">Choose input batch...</option>
+                    {% for batch in available_batches %}
+                    <option value="{{ batch.id }}">{{ batch.id }} - {{ batch.item_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Amount Used *</label>
+                <input type="number" name="inputs[${inputCount}][amount][amount]" step="0.01" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                <select name="inputs[${inputCount}][amount][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <option value="">Choose unit...</option>
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                    <option value="L">L</option>
+                    <option value="units">units</option>
+                    <option value="jars">jars</option>
+                    <option value="cases">cases</option>
+                    <option value="dozen">dozen</option>
+                    <option value="boxes">boxes</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="removeInput(this)" class="mt-2 text-red-600 hover:text-red-700 text-sm">Remove</button>
+    `;
+    container.appendChild(newInput);
+    inputCount++;
+}
+
+function addOutput() {
+    const container = document.getElementById('outputs-container');
+    const newOutput = document.createElement('div');
+    newOutput.className = 'output-row bg-green-50 rounded-lg p-4 mb-4';
+    newOutput.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">New Batch ID *</label>
+                <input type="text" name="outputs[${outputCount}][batch_id]" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Product Type *</label>
+                <select name="outputs[${outputCount}][item_id]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <option value="">Choose product...</option>
+                    {% for item in items %}
+                    <option value="{{ item.id }}">{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Amount Made *</label>
+                <input type="number" name="outputs[${outputCount}][amount][amount]" step="0.01" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                <select name="outputs[${outputCount}][amount][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <option value="">Choose unit...</option>
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                    <option value="L">L</option>
+                    <option value="units">units</option>
+                    <option value="jars">jars</option>
+                    <option value="cases">cases</option>
+                    <option value="dozen">dozen</option>
+                    <option value="boxes">boxes</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="removeOutput(this)" class="mt-2 text-red-600 hover:text-red-700 text-sm">Remove</button>
+    `;
+    container.appendChild(newOutput);
+    outputCount++;
+}
+
+function removeInput(button) {
+    button.parentElement.remove();
+}
+
+function removeOutput(button) {
+    button.parentElement.remove();
+}
+</script>
+
+{% endblock %}

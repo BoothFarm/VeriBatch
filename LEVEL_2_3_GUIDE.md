@@ -13,7 +13,7 @@ Processes define reusable recipes or standard operating procedures.
 #### Create a Process
 
 ```bash
-curl -X POST http://localhost:8000/actors/my-farm/processes \
+curl -X POST http://localhost:8000/api/actors/my-farm/processes \
   -H "Content-Type: application/json" \
   -d '{
     "id": "proc-pickled-garlic-v1",
@@ -33,10 +33,10 @@ curl -X POST http://localhost:8000/actors/my-farm/processes \
 
 ```bash
 # All processes
-curl http://localhost:8000/actors/my-farm/processes
+curl http://localhost:8000/api/actors/my-farm/processes
 
 # Filter by kind
-curl http://localhost:8000/actors/my-farm/processes?kind=recipe
+curl http://localhost:8000/api/actors/my-farm/processes?kind=recipe
 ```
 
 ### Advanced Operations
@@ -46,7 +46,7 @@ curl http://localhost:8000/actors/my-farm/processes?kind=recipe
 Record a complete production event with inputs, outputs, and packaging:
 
 ```bash
-curl -X POST http://localhost:8000/actors/my-farm/operations/production-run \
+curl -X POST http://localhost:8000/api/actors/my-farm/operations/production-run \
   -H "Content-Type: application/json" \
   -d '{
     "event_id": "evt-prod-2025-001",
@@ -87,7 +87,7 @@ curl -X POST http://localhost:8000/actors/my-farm/operations/production-run \
 Divide one batch into multiple smaller batches:
 
 ```bash
-curl -X POST http://localhost:8000/actors/my-farm/operations/split-batch \
+curl -X POST http://localhost:8000/api/actors/my-farm/operations/split-batch \
   -H "Content-Type: application/json" \
   -d '{
     "event_id": "evt-split-001",
@@ -116,7 +116,7 @@ curl -X POST http://localhost:8000/actors/my-farm/operations/split-batch \
 Combine multiple batches into one:
 
 ```bash
-curl -X POST http://localhost:8000/actors/my-farm/operations/merge-batches \
+curl -X POST http://localhost:8000/api/actors/my-farm/operations/merge-batches \
   -H "Content-Type: application/json" \
   -d '{
     "event_id": "evt-merge-001",
@@ -137,7 +137,7 @@ curl -X POST http://localhost:8000/actors/my-farm/operations/merge-batches \
 Record disposal of expired, damaged, or waste batches:
 
 ```bash
-curl -X POST http://localhost:8000/actors/my-farm/operations/dispose-batch \
+curl -X POST http://localhost:8000/api/actors/my-farm/operations/dispose-batch \
   -H "Content-Type: application/json" \
   -d '{
     "event_id": "evt-dispose-001",
@@ -160,13 +160,13 @@ View upstream (inputs) and downstream (outputs) for a batch:
 
 ```bash
 # Both directions
-curl http://localhost:8000/actors/my-farm/traceability/batches/pg-2025-01
+curl http://localhost:8000/api/actors/my-farm/traceability/batches/pg-2025-01
 
 # Upstream only (what went into this batch)
-curl http://localhost:8000/actors/my-farm/traceability/batches/pg-2025-01?direction=upstream
+curl http://localhost:8000/api/actors/my-farm/traceability/batches/pg-2025-01?direction=upstream
 
 # Downstream only (what came from this batch)
-curl http://localhost:8000/actors/my-farm/traceability/batches/pg-2025-01?direction=downstream
+curl http://localhost:8000/api/actors/my-farm/traceability/batches/pg-2025-01?direction=downstream
 ```
 
 **Response:**
@@ -201,7 +201,7 @@ curl http://localhost:8000/actors/my-farm/traceability/batches/pg-2025-01?direct
 Get a complete tree showing all dependencies:
 
 ```bash
-curl http://localhost:8000/actors/my-farm/traceability/batches/pg-2025-01/graph
+curl http://localhost:8000/api/actors/my-farm/traceability/batches/pg-2025-01/graph
 ```
 
 **Response (nested tree):**
@@ -242,7 +242,7 @@ curl http://localhost:8000/actors/my-farm/traceability/batches/pg-2025-01/graph
 Overview of all batches for an item:
 
 ```bash
-curl http://localhost:8000/actors/my-farm/traceability/items/pickled-garlic/summary
+curl http://localhost:8000/api/actors/my-farm/traceability/items/pickled-garlic/summary
 ```
 
 ## Level 3: Full Provenance
@@ -254,7 +254,7 @@ Track physical locations with coordinates.
 #### Create a Location
 
 ```bash
-curl -X POST http://localhost:8000/actors/my-farm/locations \
+curl -X POST http://localhost:8000/api/actors/my-farm/locations \
   -H "Content-Type: application/json" \
   -d '{
     "id": "kitchen-main",
@@ -278,10 +278,10 @@ curl -X POST http://localhost:8000/actors/my-farm/locations \
 
 ```bash
 # All locations
-curl http://localhost:8000/actors/my-farm/locations
+curl http://localhost:8000/api/actors/my-farm/locations
 
 # Filter by kind
-curl http://localhost:8000/actors/my-farm/locations?kind=field
+curl http://localhost:8000/api/actors/my-farm/locations?kind=field
 ```
 
 #### Location Types (kind)
@@ -301,7 +301,7 @@ Add `location_id` to batches, events, and operations:
 
 ```bash
 # Create batch at location
-curl -X POST http://localhost:8000/actors/my-farm/batches \
+curl -X POST http://localhost:8000/api/actors/my-farm/batches \
   -H "Content-Type: application/json" \
   -d '{
     "id": "batch-001",
@@ -311,7 +311,7 @@ curl -X POST http://localhost:8000/actors/my-farm/batches \
   }'
 
 # Production run at location
-curl -X POST http://localhost:8000/actors/my-farm/operations/production-run \
+curl -X POST http://localhost:8000/api/actors/my-farm/operations/production-run \
   -H "Content-Type: application/json" \
   -d '{
     "event_id": "evt-001",
@@ -326,37 +326,37 @@ curl -X POST http://localhost:8000/actors/my-farm/operations/production-run \
 
 ```bash
 # 1. Create actor
-curl -X POST http://localhost:8000/actors \
+curl -X POST http://localhost:8000/api/actors \
   -d '{"id":"demo-farm","name":"Demo Farm","kind":"producer"}'
 
 # 2. Create locations
-curl -X POST http://localhost:8000/actors/demo-farm/locations \
+curl -X POST http://localhost:8000/api/actors/demo-farm/locations \
   -d '{"id":"field-1","name":"Field #1","kind":"field"}'
-curl -X POST http://localhost:8000/actors/demo-farm/locations \
+curl -X POST http://localhost:8000/api/actors/demo-farm/locations \
   -d '{"id":"kitchen","name":"Processing Kitchen","kind":"kitchen"}'
 
 # 3. Create items
-curl -X POST http://localhost:8000/actors/demo-farm/items \
+curl -X POST http://localhost:8000/api/actors/demo-farm/items \
   -d '{"id":"garlic-raw","name":"Fresh Garlic","category":"raw_material","unit":"kg"}'
-curl -X POST http://localhost:8000/actors/demo-farm/items \
+curl -X POST http://localhost:8000/api/actors/demo-farm/items \
   -d '{"id":"pickled-garlic","name":"Pickled Garlic 500ml","category":"finished_good","unit":"jar_500ml"}'
-curl -X POST http://localhost:8000/actors/demo-farm/items \
+curl -X POST http://localhost:8000/api/actors/demo-farm/items \
   -d '{"id":"glass-jar","name":"Glass Jar 500ml","category":"packaging","unit":"unit"}'
 
 # 4. Create process
-curl -X POST http://localhost:8000/actors/demo-farm/processes \
+curl -X POST http://localhost:8000/api/actors/demo-farm/processes \
   -d '{"id":"proc-pg-v1","name":"Pickled Garlic v1","kind":"recipe","version":"1.0"}'
 
 # 5. Harvest garlic
-curl -X POST http://localhost:8000/actors/demo-farm/batches \
+curl -X POST http://localhost:8000/api/actors/demo-farm/batches \
   -d '{"id":"garlic-harvest-001","item_id":"garlic-raw","location_id":"field-1","quantity":{"amount":50,"unit":"kg"},"origin_kind":"harvested"}'
 
 # 6. Receive packaging
-curl -X POST http://localhost:8000/actors/demo-farm/batches \
+curl -X POST http://localhost:8000/api/actors/demo-farm/batches \
   -d '{"id":"jars-001","item_id":"glass-jar","quantity":{"amount":200,"unit":"unit"},"origin_kind":"received"}'
 
 # 7. Production run
-curl -X POST http://localhost:8000/actors/demo-farm/operations/production-run \
+curl -X POST http://localhost:8000/api/actors/demo-farm/operations/production-run \
   -d '{
     "event_id":"evt-prod-001",
     "process_id":"proc-pg-v1",
@@ -368,7 +368,7 @@ curl -X POST http://localhost:8000/actors/demo-farm/operations/production-run \
   }'
 
 # 8. Split for different markets
-curl -X POST http://localhost:8000/actors/demo-farm/operations/split-batch \
+curl -X POST http://localhost:8000/api/actors/demo-farm/operations/split-batch \
   -d '{
     "event_id":"evt-split-001",
     "source_batch_id":"pg-batch-001",
@@ -379,8 +379,8 @@ curl -X POST http://localhost:8000/actors/demo-farm/operations/split-batch \
   }'
 
 # 9. View traceability
-curl http://localhost:8000/actors/demo-farm/traceability/batches/pg-retail
-curl http://localhost:8000/actors/demo-farm/traceability/batches/pg-retail/graph
+curl http://localhost:8000/api/actors/demo-farm/traceability/batches/pg-retail
+curl http://localhost:8000/api/actors/demo-farm/traceability/batches/pg-retail/graph
 ```
 
 ## API Endpoints Summary

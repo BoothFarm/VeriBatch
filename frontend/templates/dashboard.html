@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - OriginStack{% endblock %}
+
+{% block content %}
+
+{% if not actors %}
+<!-- First-time setup -->
+<div class="max-w-2xl mx-auto py-12">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">🎉 Welcome to OriginStack!</h1>
+        <p class="text-xl text-gray-600">Let's get your farm or business set up for traceability tracking.</p>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <h2 class="text-2xl font-semibold mb-6">Step 1: Create Your Business Profile</h2>
+        
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h3 class="font-semibold text-blue-900 mb-2">What you'll track:</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• Your products and ingredients</li>
+                <li>• Batch/lot codes with dates</li>
+                <li>• Production processes</li>
+                <li>• Full traceability from farm to shelf</li>
+            </ul>
+        </div>
+        
+        <div class="text-center">
+            <a href="/actors/new" class="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition inline-block">
+                Create Your Business Profile →
+            </a>
+            <p class="text-sm text-gray-500 mt-3">Takes less than 2 minutes</p>
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+<!-- Header with business info -->
+<div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl p-8 mb-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold">{{ stats.actor.name }}</h1>
+            <p class="text-green-100 mt-1">Production Dashboard</p>
+        </div>
+        <div class="text-right">
+            <div class="text-2xl font-bold">{{ stats.active_batches }}</div>
+            <div class="text-sm text-green-100">Active Batches</div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert/Status Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Alerts -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-amber-500 mr-2">⚠️</span>
+            Alerts & Notifications
+        </h2>
+        <div class="space-y-3">
+            {% if stats.active_batches == 0 %}
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
+                <p class="text-blue-800 text-sm">
+                    <strong>Ready to start tracking!</strong> Create your first batch to begin traceability.
+                </p>
+            </div>
+            {% endif %}
+            
+            {% if stats.items_count == 0 %}
+            <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded">
+                <p class="text-amber-800 text-sm">
+                    <strong>Add products first:</strong> Define your items before creating batches.
+                </p>
+            </div>
+            {% endif %}
+            
+            {% if stats.items_count > 0 and stats.batches_count == 0 %}
+            <div class="bg-green-50 border-l-4 border-green-400 p-3 rounded">
+                <p class="text-green-800 text-sm">
+                    <strong>Great!</strong> Items created. Now add your first batch with a lot code.
+                </p>
+            </div>
+            {% endif %}
+            
+            {% if stats.active_batches > 0 and stats.events_count == 0 %}
+            <div class="bg-purple-50 border-l-4 border-purple-400 p-3 rounded">
+                <p class="text-purple-800 text-sm">
+                    <strong>Level up:</strong> Start logging production events for full traceability.
+                </p>
+            </div>
+            {% endif %}
+            
+            {% if stats.active_batches > 0 and stats.events_count > 0 %}
+            <div class="bg-green-50 border-l-4 border-green-400 p-3 rounded">
+                <p class="text-green-800 text-sm">
+                    <strong>Excellent!</strong> You're tracking everything. Ready for any inspection.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Your Numbers</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="text-center bg-gray-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-gray-900">{{ stats.items_count }}</div>
+                <div class="text-sm text-gray-600">Products</div>
+            </div>
+            <div class="text-center bg-gray-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-gray-900">{{ stats.batches_count }}</div>
+                <div class="text-sm text-gray-600">Total Batches</div>
+            </div>
+            <div class="text-center bg-gray-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-gray-900">{{ stats.events_count }}</div>
+                <div class="text-sm text-gray-600">Events Logged</div>
+            </div>
+            <div class="text-center bg-gray-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-gray-900">{{ stats.processes_count }}</div>
+                <div class="text-sm text-gray-600">Recipes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    
+    <!-- Quick Create -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+        <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-green-500 mr-2">⚡</span>
+            Quick Actions
+        </h3>
+        <div class="space-y-3">
+            <a href="/actors/{{ stats.actor.id }}/batches/new" 
+               class="block bg-green-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-green-700 transition text-center">
+                + New Batch
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/items/new" 
+               class="block bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 transition text-center">
+                + Add Product
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/production-run/new" 
+               class="block bg-purple-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-purple-700 transition text-center">
+                🏭 Production Run
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/split-batch/new" 
+               class="block bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-orange-700 transition text-center">
+                ✂️ Split Batch
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/merge-batch/new" 
+               class="block bg-indigo-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-indigo-700 transition text-center">
+                🔗 Merge Batches
+            </a>
+        </div>
+    </div>
+    
+    <!-- View & Manage -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+        <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-blue-500 mr-2">📋</span>
+            View & Manage
+        </h3>
+        <div class="space-y-2">
+            <a href="/actors/{{ stats.actor.id }}/batches" 
+               class="block text-blue-700 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded text-sm">
+                All Batches ({{ stats.batches_count }})
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/items" 
+               class="block text-blue-700 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded text-sm">
+                Products ({{ stats.items_count }})
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/events" 
+               class="block text-blue-700 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded text-sm">
+                Event History
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/processes" 
+               class="block text-blue-700 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded text-sm">
+                Recipes & SOPs
+            </a>
+        </div>
+    </div>
+    
+    <!-- Traceability -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+        <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-purple-500 mr-2">🔍</span>
+            Traceability
+        </h3>
+        <div class="space-y-2">
+            <a href="/actors/{{ stats.actor.id }}/traceability" 
+               class="block text-purple-700 hover:text-purple-800 hover:bg-purple-50 px-2 py-1 rounded text-sm">
+                Trace Any Batch
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/batches?status=active" 
+               class="block text-purple-700 hover:text-purple-800 hover:bg-purple-50 px-2 py-1 rounded text-sm">
+                Active Inventory
+            </a>
+            <div class="text-xs text-gray-500 mt-2 px-2">
+                Track from farm to shelf in seconds
+            </div>
+        </div>
+    </div>
+    
+    <!-- Export & Reports -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-amber-500">
+        <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="text-amber-500 mr-2">📊</span>
+            Reports & Export
+        </h3>
+        <div class="space-y-2">
+            <a href="/actors/{{ stats.actor.id }}/export/ooj-archive" 
+               class="block bg-amber-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-amber-700 transition text-center">
+                Export All Data
+            </a>
+            <a href="/docs" 
+               class="block text-amber-700 hover:text-amber-800 hover:bg-amber-50 px-2 py-1 rounded text-sm">
+                API Access
+            </a>
+            <div class="text-xs text-gray-500 mt-2 px-2">
+                Ready for inspectors & auditors
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inspection Readiness Banner -->
+<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6 text-center">
+    <h2 class="text-xl font-semibold mb-2">🛡️ Inspection Ready</h2>
+    <p class="text-blue-100 mb-4">
+        Your traceability system meets food safety requirements. 
+        Export reports instantly when inspectors arrive.
+    </p>
+    <a href="/actors/{{ stats.actor.id }}/export/ooj-archive" 
+       class="bg-white text-blue-600 px-6 py-2 rounded font-semibold hover:bg-gray-100 transition">
+        Generate Inspection Report →
+    </a>
+</div>
+
+{% endif %}
+{% endblock %}

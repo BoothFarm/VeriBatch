@@ -4,7 +4,7 @@ FastAPI main application
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import actors, items, batches, events, processes, locations, operations, traceability
+from app.api import actors, items, batches, events, processes, locations, operations, traceability, export, frontend
 from app.db.database import engine, Base
 
 # Create database tables
@@ -25,28 +25,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Level 1 routers
-app.include_router(actors.router)
-app.include_router(items.router)
-app.include_router(batches.router)
-app.include_router(events.router)
+# API routes (prefixed with /api)
+app.include_router(actors.router, prefix="/api")
+app.include_router(items.router, prefix="/api")
+app.include_router(batches.router, prefix="/api")
+app.include_router(events.router, prefix="/api")
+app.include_router(processes.router, prefix="/api")
+app.include_router(operations.router, prefix="/api")
+app.include_router(traceability.router, prefix="/api")
+app.include_router(locations.router, prefix="/api")
+app.include_router(export.router, prefix="/api")
 
-# Level 2 routers
-app.include_router(processes.router)
-app.include_router(operations.router)
-app.include_router(traceability.router)
-
-# Level 3 routers
-app.include_router(locations.router)
+# Frontend routes (no prefix - these are the default)
+app.include_router(frontend.router)
 
 
-@app.get("/")
-def root():
+@app.get("/api")
+def api_info():
     return {
-        "name": "OriginStack",
+        "name": "OriginStack API",
         "version": "0.2.0",
         "schema": "open-origin-json/0.5",
-        "description": "Open Origin JSON ERP for small producers",
+        "description": "Open Origin JSON ERP API for small producers",
         "levels": {
             "1": "Minimal Traceability (Actors, Items, Batches)",
             "2": "Process & Event Tracking (Processes, Operations, Traceability)",

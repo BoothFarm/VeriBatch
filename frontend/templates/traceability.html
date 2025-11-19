@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Traceability Explorer - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Traceability Explorer</h1>
+    <p class="text-gray-600 mt-2">Trace the full history of any batch</p>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Select a Batch to Trace</h2>
+    <p class="text-gray-600 mb-4">
+        Choose a batch below to view its complete upstream and downstream traceability graph.
+    </p>
+    
+    {% if not batches %}
+    <p class="text-gray-500">No batches available for traceability.</p>
+    {% else %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for batch in batches %}
+        <a href="/actors/{{ actor_id }}/traceability/batch/{{ batch.id }}" 
+           class="block border border-gray-200 rounded p-4 hover:border-green-500 hover:shadow transition">
+            <div class="font-mono text-sm text-gray-900 mb-1">{{ batch.id }}</div>
+            <div class="text-sm text-gray-600">{{ batch.item_id }}</div>
+            <div class="mt-2 flex items-center justify-between">
+                {% if batch.status == 'active' %}
+                <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Active</span>
+                {% elif batch.status == 'depleted' %}
+                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">Depleted</span>
+                {% else %}
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">{{ batch.status }}</span>
+                {% endif %}
+                <span class="text-xs text-gray-500">{{ batch.production_date }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="font-semibold text-blue-900 mb-2">💡 What is Traceability?</h3>
+    <p class="text-blue-800 text-sm">
+        Traceability lets you see the complete history of a batch:
+    </p>
+    <ul class="list-disc list-inside text-blue-800 text-sm mt-2 space-y-1">
+        <li><strong>Upstream:</strong> What ingredients/batches went into making this batch</li>
+        <li><strong>Downstream:</strong> What batches were created from this batch</li>
+        <li><strong>Events:</strong> All processing, splitting, merging, and disposal events</li>
+        <li><strong>Full Graph:</strong> Recursive tree showing all dependencies</li>
+    </ul>
+</div>
+
+<div class="mt-8">
+    <a href="/dashboard" class="text-green-600 hover:underline">← Back to Dashboard</a>
+</div>
+{% endblock %}

@@ -7,6 +7,12 @@ from sqlalchemy.orm import Session
 from app.models import database as db_models
 from ooj_client import entities
 from app.services import batch_service
+from app.services.validation import (
+    validate_split_quantities,
+    validate_merge_quantities,
+    validate_production_inputs,
+    ValidationError
+)
 
 
 def record_processing_event(
@@ -28,6 +34,9 @@ def record_processing_event(
     2. Update input batch statuses if fully consumed
     3. Track packaging materials used
     """
+    # Validate inputs have sufficient quantity
+    validate_production_inputs(db, actor_id, inputs)
+    
     now = datetime.utcnow().isoformat() + "Z"
     if not timestamp:
         timestamp = now
@@ -123,6 +132,9 @@ def split_batch(
     Split a batch into multiple new batches
     Creates a split event and new batch records
     """
+    # Validate split quantities
+    validate_split_quantities(db, actor_id, source_batch_id, output_batches)
+    
     now = datetime.utcnow().isoformat() + "Z"
     if not timestamp:
         timestamp = now
@@ -219,6 +231,9 @@ def merge_batches(
     Merge multiple batches into one
     Creates a merge event and new output batch
     """
+    # Validate merge quantities
+    validate_merge_quantities(db, actor_id, source_batch_ids, output_quantity)
+    
     now = datetime.utcnow().isoformat() + "Z"
     if not timestamp:
         timestamp = now

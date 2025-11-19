@@ -6,6 +6,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.models import database as db_models
 from ooj_client import entities
+from app.services.validation import validate_batch_quantity, validate_date_order, ValidationError
 
 
 def create_batch(
@@ -16,9 +17,18 @@ def create_batch(
     quantity: Optional[entities.Quantity] = None,
     status: str = "active",
     production_date: Optional[str] = None,
+    expiration_date: Optional[str] = None,
     **kwargs
 ) -> db_models.Batch:
-    """Create a new batch with OOJ compliance"""
+    """Create a new batch with OOJ compliance and validation"""
+    # Validate quantity if provided
+    if quantity:
+        qty_dict = {"amount": quantity.amount, "unit": quantity.unit}
+        validate_batch_quantity(qty_dict)
+    
+    # Validate dates
+    validate_date_order(production_date, expiration_date)
+    
     now = datetime.utcnow().isoformat() + "Z"
     
     batch = entities.Batch(
@@ -28,6 +38,7 @@ def create_batch(
         quantity=quantity,
         status=status,
         production_date=production_date,
+        expiration_date=expiration_date,
         created_at=now,
         updated_at=now,
         **kwargs
@@ -39,6 +50,7 @@ def create_batch(
         item_id=item_id,
         status=status,
         production_date=production_date,
+        expiration_date=expiration_date,
         jsonb_doc=batch.to_dict()
     )
     

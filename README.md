@@ -1,15 +1,16 @@
 # OriginStack
 
-**Open Origin JSON ERP for Small Producers**
+**Pass Every Food Safety Inspection with Digital Traceability**
 
-A SaaS system for small producers (farms + cottage food) where everything — inventory, production, batch tracking, labels, compliance — is stored and exposed as **Open Origin JSON (OOJ) v0.5**.
+Never worry about recalls or compliance again. OriginStack helps small producers track every batch from farm to shelf with industry-standard digital records.
 
-## What Makes OriginStack Special
+## Why Producers Choose OriginStack
 
-✨ **OOJ Native** - Every object is Open Origin JSON v0.5 compliant out of the box  
-📦 **Never Locked In** - Export all your data as clean OOJ archives anytime  
-🎯 **Built for Small Producers** - Designed for farms, cottage food, herbalists, fermenters  
-📈 **Incremental Adoption** - Start simple (Level 1), grow into full traceability (Level 2/3)
+🛡️ **Pass Every Inspection** - Complete digital records ready for FDA, organic, and HACCP auditors  
+⚡ **Handle Recalls Fast** - Find all affected products in under 30 seconds  
+🔓 **Own Your Data** - Export everything anytime in industry-standard Open Origin JSON format  
+🎯 **Built for Small Scale** - Designed for farms, cottage food, herbalists, and small processors  
+📈 **Start Simple, Grow Advanced** - Begin with basic lot tracking, expand to full supply chain traceability
 
 ## Features
 

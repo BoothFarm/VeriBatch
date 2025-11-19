@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'create' %}New Item{% else %}Edit Item{% endif %} - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">
+        {% if mode == 'create' %}Create New Item{% else %}Edit Item{% endif %}
+    </h1>
+    <p class="text-gray-600 mt-2">{% if mode == 'create' %}Add a new product or ingredient{% else %}Update item information{% endif %}</p>
+</div>
+
+<div class="max-w-2xl">
+    <form method="POST" action="{% if mode == 'create' %}/actors/{{ actor_id }}/items/create{% else %}/actors/{{ actor_id }}/items/{{ item.id }}/update{% endif %}" class="bg-white rounded-lg shadow p-6">
+        
+        <!-- ID -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Item ID *</label>
+            <input type="text" name="id" value="{{ item.id if item else '' }}" 
+                   {% if mode == 'edit' %}readonly{% endif %}
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {% if mode == 'edit' %}bg-gray-100{% endif %}"
+                   required>
+            <p class="text-xs text-gray-500 mt-1">Unique identifier (e.g., "organic-tomatoes")</p>
+        </div>
+
+        <!-- Name -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+            <input type="text" name="name" value="{{ item.name if item else '' }}" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                   required>
+        </div>
+
+
+
+        <!-- Description -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <textarea name="description" rows="3" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">{{ item.description if item else '' }}</textarea>
+        </div>
+
+        <!-- Category (was Kind) -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="raw_material" {% if item and item.category == 'raw_material' %}selected{% endif %}>Raw Material</option>
+                <option value="ingredient" {% if item and item.category == 'ingredient' %}selected{% endif %}>Ingredient</option>
+                <option value="packaging" {% if item and item.category == 'packaging' %}selected{% endif %}>Packaging</option>
+                <option value="finished_good" {% if item and item.category == 'finished_good' %}selected{% endif %}>Finished Good</option>
+                <option value="intermediate" {% if item and item.category == 'intermediate' %}selected{% endif %}>Intermediate</option>
+            </select>
+        </div>
+
+        <!-- Unit -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Default Unit</label>
+            <input type="text" name="unit" value="{{ item.unit if item else '' }}" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                   placeholder="e.g., kg, L, jar_500ml, unit">
+            <p class="text-xs text-gray-500 mt-1">Default unit of measure for this item</p>
+        </div>
+
+        <!-- Variety -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Variety</label>
+            <input type="text" name="variety" value="{{ item.variety if item else '' }}" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                   placeholder="e.g., Heirloom, Cherry, Roma">
+            <p class="text-xs text-gray-500 mt-1">Optional: specific cultivar or variant</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3">
+            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                {% if mode == 'create' %}Create Item{% else %}Update Item{% endif %}
+            </button>
+            <a href="/actors/{{ actor_id }}/items" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

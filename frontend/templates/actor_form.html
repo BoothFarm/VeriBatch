@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'create' %}New Actor{% else %}Edit Actor{% endif %} - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">
+        {% if mode == 'create' %}Create New Actor{% else %}Edit Actor{% endif %}
+    </h1>
+    <p class="text-gray-600 mt-2">{% if mode == 'create' %}Add a new organization{% else %}Update actor information{% endif %}</p>
+</div>
+
+<div class="max-w-2xl">
+    <form method="POST" action="{% if mode == 'create' %}/actors/create{% else %}/actors/{{ actor.id }}/update{% endif %}" class="bg-white rounded-lg shadow p-6">
+        
+        <!-- ID (disabled for edit) -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Actor ID *</label>
+            <input type="text" name="id" value="{{ actor.id if actor else '' }}" 
+                   {% if mode == 'edit' %}readonly{% endif %}
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {% if mode == 'edit' %}bg-gray-100{% endif %}"
+                   required>
+            <p class="text-xs text-gray-500 mt-1">Unique identifier (lowercase, no spaces)</p>
+        </div>
+
+        <!-- Name -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+            <input type="text" name="name" value="{{ actor.name if actor else '' }}" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                   required>
+        </div>
+
+        <!-- Kind -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Kind</label>
+            <select name="kind" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="producer" {% if actor and actor.kind == 'producer' %}selected{% endif %}>Producer</option>
+                <option value="processor" {% if actor and actor.kind == 'processor' %}selected{% endif %}>Processor</option>
+                <option value="distributor" {% if actor and actor.kind == 'distributor' %}selected{% endif %}>Distributor</option>
+                <option value="retailer" {% if actor and actor.kind == 'retailer' %}selected{% endif %}>Retailer</option>
+            </select>
+        </div>
+
+        <!-- Contacts Section -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Contact Information</h3>
+            
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" name="email" value="{{ actor.contacts.email if actor and actor.contacts else '' }}" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input type="tel" name="phone" value="{{ actor.contacts.phone if actor and actor.contacts else '' }}" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                <input type="url" name="website" value="{{ actor.contacts.website if actor and actor.contacts else '' }}" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+        </div>
+
+        <!-- Address Section -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Address</h3>
+            
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
+                <input type="text" name="street" value="{{ actor.address.street if actor and actor.address else '' }}" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                    <input type="text" name="city" value="{{ actor.address.city if actor and actor.address else '' }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Region/State</label>
+                    <input type="text" name="region" value="{{ actor.address.region if actor and actor.address else '' }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                    <input type="text" name="postal_code" value="{{ actor.address.postal_code if actor and actor.address else '' }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                    <input type="text" name="country" value="{{ actor.address.country if actor and actor.address else '' }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3">
+            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                {% if mode == 'create' %}Create Actor{% else %}Update Actor{% endif %}
+            </button>
+            <a href="/actors" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

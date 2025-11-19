@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Split Batch - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">✂️ Split Batch</h1>
+    <p class="text-gray-600 mt-2">Divide one batch into multiple smaller batches</p>
+</div>
+
+<!-- Helper -->
+<div class="max-w-4xl mb-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="font-semibold text-blue-900 mb-2">💡 When to split a batch?</h3>
+        <ul class="text-blue-800 text-sm space-y-1">
+            <li>• <strong>Different markets:</strong> 30 jars for farmers market, 18 for restaurants</li>
+            <li>• <strong>Different processing:</strong> Some for immediate sale, some for aging</li>
+            <li>• <strong>Quality separation:</strong> Grade A vs Grade B products</li>
+            <li>• <strong>Customer orders:</strong> Dividing bulk batch for specific orders</li>
+        </ul>
+    </div>
+</div>
+
+<div class="max-w-4xl">
+    <form method="POST" action="/actors/{{ actor_id }}/split-batch/create" class="bg-white rounded-xl shadow-lg p-8">
+        
+        <!-- Basic Info -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Split Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Event ID -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Split ID *
+                    </label>
+                    <input type="text" name="event_id" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                           placeholder="e.g., SPLIT-2025-001"
+                           required>
+                    <p class="text-sm text-gray-500 mt-1">Unique ID for this split operation</p>
+                </div>
+
+                <!-- Source Batch -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Batch to Split *
+                    </label>
+                    <select name="source_batch_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                        <option value="">Choose batch to split...</option>
+                        {% for batch in available_batches %}
+                        <option value="{{ batch.id }}">{{ batch.id }} - {{ batch.item_id }} ({{ batch.quantity.amount if batch.quantity }} {{ batch.quantity.unit if batch.quantity }})</option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-sm text-gray-500 mt-1">This batch will be marked as "depleted" after splitting</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Batches -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">📤 Split Into These Batches</h2>
+            
+            <div id="outputs-container">
+                <!-- First output -->
+                <div class="output-row bg-green-50 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">New Batch ID *</label>
+                            <input type="text" name="outputs[0][batch_id]" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                                   placeholder="e.g., BATCH-MARKET-001" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+                            <input type="number" name="outputs[0][amount][amount]" step="0.01" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                   placeholder="30" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                            <select name="outputs[0][amount][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose unit...</option>
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                                <option value="L">L</option>
+                                <option value="gal">gal</option>
+                                <option value="units">units</option>
+                                <option value="jars">jars</option>
+                                <option value="cases">cases</option>
+                                <option value="dozen">dozen</option>
+                                <option value="boxes">boxes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second output -->
+                <div class="output-row bg-green-50 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">New Batch ID *</label>
+                            <input type="text" name="outputs[1][batch_id]" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono"
+                                   placeholder="e.g., BATCH-WHOLESALE-001" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+                            <input type="number" name="outputs[1][amount][amount]" step="0.01" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                   placeholder="18" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                            <select name="outputs[1][amount][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Choose unit...</option>
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                                <option value="L">L</option>
+                                <option value="gal">gal</option>
+                                <option value="units">units</option>
+                                <option value="jars">jars</option>
+                                <option value="cases">cases</option>
+                                <option value="dozen">dozen</option>
+                                <option value="boxes">boxes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" onclick="addOutput()" class="text-green-600 hover:text-green-700 font-medium">
+                + Add Another Split
+            </button>
+        </div>
+
+        <!-- Optional Fields -->
+        <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Additional Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Location -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Where Split?
+                    </label>
+                    <select name="location_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Location not tracked</option>
+                        {% for location in locations %}
+                        <option value="{{ location.id }}">{{ location.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Performed By -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Split By
+                    </label>
+                    <input type="text" name="performed_by" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                           placeholder="Your name">
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="mb-8">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Split Notes (Optional)
+            </label>
+            <textarea name="notes" rows="3" 
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="e.g., Split for farmers market (30 jars) and restaurant orders (18 jars)"></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="border-t border-gray-200 pt-6">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="flex-1 bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition shadow-md">
+                    ✂️ Split This Batch
+                </button>
+                <a href="/actors/{{ actor_id }}/batches" 
+                   class="flex-1 text-center bg-gray-100 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- What Happens Next -->
+<div class="max-w-4xl mt-8">
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 class="font-semibold text-green-900 mb-2">🎯 What happens when you split?</h3>
+        <ul class="text-green-800 text-sm space-y-1">
+            <li>• <strong>Original batch marked as "depleted"</strong> - it's been fully used</li>
+            <li>• <strong>New batches created</strong> with the amounts you specified</li>
+            <li>• <strong>Full traceability maintained</strong> - new batches link back to original</li>
+            <li>• <strong>Split event recorded</strong> for audit trail</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+let outputCount = 2; // Start at 2 since we have 2 initial outputs
+
+function addOutput() {
+    const container = document.getElementById('outputs-container');
+    const newOutput = document.createElement('div');
+    newOutput.className = 'output-row bg-green-50 rounded-lg p-4 mb-4';
+    newOutput.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">New Batch ID *</label>
+                <input type="text" name="outputs[${outputCount}][batch_id]" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 font-mono" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+                <input type="number" name="outputs[${outputCount}][amount][amount]" step="0.01" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                <select name="outputs[${outputCount}][amount][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <option value="">Choose unit...</option>
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                    <option value="L">L</option>
+                    <option value="units">units</option>
+                    <option value="jars">jars</option>
+                    <option value="cases">cases</option>
+                    <option value="dozen">dozen</option>
+                    <option value="boxes">boxes</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="removeOutput(this)" class="mt-2 text-red-600 hover:text-red-700 text-sm">Remove</button>
+    `;
+    container.appendChild(newOutput);
+    outputCount++;
+}
+
+function removeOutput(button) {
+    button.parentElement.remove();
+}
+</script>
+
+{% endblock %}

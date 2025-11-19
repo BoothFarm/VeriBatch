@@ -8,6 +8,7 @@ from datetime import datetime
 
 from app.db.database import get_db
 from app.services import event_service
+from app.services.validation import ValidationError
 
 router = APIRouter(prefix="/actors/{actor_id}/operations", tags=["operations"])
 
@@ -45,6 +46,8 @@ def split_batch_operation(
             timestamp=operation.get("timestamp")
         )
         return event.jsonb_doc
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -83,6 +86,8 @@ def merge_batches_operation(
             timestamp=operation.get("timestamp")
         )
         return event.jsonb_doc
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -119,6 +124,8 @@ def dispose_batch_operation(
             timestamp=operation.get("timestamp")
         )
         return event.jsonb_doc
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -167,6 +174,8 @@ def production_run_operation(
             timestamp=operation.get("timestamp")
         )
         return event.jsonb_doc
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:

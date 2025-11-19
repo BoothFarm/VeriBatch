@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Processes - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Processes & Recipes</h1>
+            <p class="text-gray-600 mt-2">Production procedures for {{ actor_id }}</p>
+        </div>
+        <a href="/actors/{{ actor_id }}/processes/new" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            + New Process
+        </a>
+    </div>
+</div>
+
+{% if not processes %}
+<div class="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+    <p class="text-gray-600 mb-4">No processes yet. Create your first process via the API.</p>
+    <a href="/docs" class="text-green-600 hover:underline">View API Documentation →</a>
+</div>
+{% else %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% for process in processes %}
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">{{ process.name }}</h3>
+                <p class="text-sm text-gray-500 font-mono">{{ process.id }}</p>
+            </div>
+            {% if process.version %}
+            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                v{{ process.version }}
+            </span>
+            {% endif %}
+        </div>
+        
+        {% if process.kind %}
+        <div class="mb-3">
+            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                {{ process.kind }}
+            </span>
+        </div>
+        {% endif %}
+        
+        {% if process.description %}
+        <p class="text-sm text-gray-600 mb-4">{{ process.description }}</p>
+        {% endif %}
+        
+        {% if process.steps %}
+        <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Steps:</h4>
+            <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
+                {% for step in process.steps[:3] %}
+                <li>{{ step }}</li>
+                {% endfor %}
+                {% if process.steps|length > 3 %}
+                <li class="text-gray-400">+ {{ process.steps|length - 3 }} more...</li>
+                {% endif %}
+            </ol>
+        </div>
+        {% endif %}
+        
+        <div class="pt-4 border-t border-gray-200">
+            <div class="flex gap-2">
+                <a href="/actors/{{ actor_id }}/processes/{{ process.id }}" 
+                   class="text-green-600 hover:underline text-sm">
+                    View Details →
+                </a>
+                <span class="text-gray-300">|</span>
+                <form method="POST" action="/actors/{{ actor_id }}/processes/{{ process.id }}/delete" class="inline"
+                      onsubmit="return confirm('Delete {{ process.name }}?');">
+                    <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="mt-4 text-gray-600 text-sm">
+    Total: {{ processes|length }} process(es)
+</div>
+
+{% endif %}
+
+<div class="mt-8">
+    <a href="/dashboard" class="text-green-600 hover:underline">← Back to Dashboard</a>
+</div>
+{% endblock %}

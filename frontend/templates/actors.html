@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Actors - OriginStack{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Actors</h1>
+            <p class="text-gray-600 mt-2">All organizations in your system</p>
+        </div>
+        <a href="/actors/new" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            + New Actor
+        </a>
+    </div>
+</div>
+
+{% if not actors %}
+<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-2">👋 No Actors Yet</h2>
+    <p class="mb-4">Create your first actor using the API:</p>
+    <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto text-sm">
+curl -X POST http://localhost:8000/api/actors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "my-farm",
+    "name": "My Farm",
+    "kind": "producer",
+    "contacts": {"email": "farm@example.com"}
+  }'
+    </pre>
+</div>
+{% else %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for actor in actors %}
+    <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-6">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h3 class="text-xl font-semibold text-gray-900">{{ actor.name }}</h3>
+                <p class="text-sm text-gray-500 font-mono mt-1">{{ actor.id }}</p>
+            </div>
+            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
+                {{ actor.kind or 'producer' }}
+            </span>
+        </div>
+        
+        {% if actor.contacts %}
+        <div class="mb-4 text-sm text-gray-600">
+            {% if actor.contacts.email %}
+            <div>📧 {{ actor.contacts.email }}</div>
+            {% endif %}
+            {% if actor.contacts.phone %}
+            <div>📞 {{ actor.contacts.phone }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if actor.address %}
+        <div class="mb-4 text-sm text-gray-600">
+            📍 {{ actor.address.city or '' }}{% if actor.address.region %}, {{ actor.address.region }}{% endif %}{% if actor.address.country %}, {{ actor.address.country }}{% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="pt-4 border-t border-gray-200">
+            <div class="flex gap-2">
+                <a href="/actors/{{ actor.id }}/edit" 
+                   class="text-blue-600 hover:underline text-sm font-medium">
+                    Edit
+                </a>
+                <span class="text-gray-300">|</span>
+                <form method="POST" action="/actors/{{ actor.id }}/delete" class="inline" 
+                      onsubmit="return confirm('Delete {{ actor.name }}? This cannot be undone.');">
+                    <button type="submit" class="text-red-600 hover:underline text-sm font-medium">
+                        Delete
+                    </button>
+                </form>
+                <span class="text-gray-300">|</span>
+                <a href="/dashboard" 
+                   class="text-green-600 hover:underline text-sm font-medium">
+                    View Dashboard →
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="mt-6 text-gray-600 text-sm">
+    Total: {{ actors|length }} actor(s)
+</div>
+
+{% endif %}
+
+<div class="mt-8">
+    <a href="/dashboard" class="text-green-600 hover:underline">← Back to Dashboard</a>
+</div>
+{% endblock %}

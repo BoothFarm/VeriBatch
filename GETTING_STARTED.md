@@ -121,7 +121,7 @@ Let's create a complete workflow: Actor → Item → Batch
 ### 1. Create an Actor (Your Farm)
 
 ```bash
-curl -X POST http://localhost:8000/actors \
+curl -X POST http://localhost:8000/api/actors \
   -H "Content-Type: application/json" \
   -d '{
     "id": "demo-farm",
@@ -143,7 +143,7 @@ curl -X POST http://localhost:8000/actors \
 
 ```bash
 # Raw material
-curl -X POST http://localhost:8000/actors/demo-farm/items \
+curl -X POST http://localhost:8000/api/actors/demo-farm/items \
   -H "Content-Type: application/json" \
   -d '{
     "id": "garlic-raw",
@@ -153,7 +153,7 @@ curl -X POST http://localhost:8000/actors/demo-farm/items \
   }'
 
 # Finished product
-curl -X POST http://localhost:8000/actors/demo-farm/items \
+curl -X POST http://localhost:8000/api/actors/demo-farm/items \
   -H "Content-Type: application/json" \
   -d '{
     "id": "pickled-garlic",
@@ -166,7 +166,7 @@ curl -X POST http://localhost:8000/actors/demo-farm/items \
 ### 3. Create a Batch
 
 ```bash
-curl -X POST http://localhost:8000/actors/demo-farm/batches \
+curl -X POST http://localhost:8000/api/actors/demo-farm/batches \
   -H "Content-Type: application/json" \
   -d '{
     "id": "batch-2025-001",
@@ -185,16 +185,16 @@ curl -X POST http://localhost:8000/actors/demo-farm/batches \
 
 ```bash
 # List all items
-curl http://localhost:8000/actors/demo-farm/items
+curl http://localhost:8000/api/actors/demo-farm/items
 
 # List all batches
-curl http://localhost:8000/actors/demo-farm/batches
+curl http://localhost:8000/api/actors/demo-farm/batches
 
 # Get specific batch
-curl http://localhost:8000/actors/demo-farm/batches/batch-2025-001
+curl http://localhost:8000/api/actors/demo-farm/batches/batch-2025-001
 
 # Filter batches by status
-curl http://localhost:8000/actors/demo-farm/batches?status=active
+curl http://localhost:8000/api/actors/demo-farm/batches?status=active
 ```
 
 ## Using the Interactive API Docs
@@ -256,5 +256,11 @@ uvicorn app.main:app --reload --port 8001
 - Check the [backend README](../backend/README.md)
 - Review the API docs at http://localhost:8000/docs
 - Look at example code in `tests/test_api.py`
+
+## Updated URLs
+
+- **Frontend (UI):** http://localhost:8000/ (default)
+- **API:** http://localhost:8000/api/
+- **API Docs:** http://localhost:8000/docs
 
 Happy tracking! 🎯

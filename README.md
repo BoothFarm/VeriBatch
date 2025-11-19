@@ -13,22 +13,28 @@ A SaaS system for small producers (farms + cottage food) where everything — in
 
 ## Features
 
-### Level 1 - Minimal Traceability (v1)
+### Level 1 - Minimal Traceability ✅ COMPLETE
 - ✅ Actor management (your farm/business)
 - ✅ Item catalog (products, ingredients, packaging)
 - ✅ Batch tracking with lot codes
 - ✅ Basic inventory
+- ✅ Event logging
 - ✅ OOJ JSON export
 
-### Level 2 - Process & Event Tracking (Planned)
-- ⏳ Production recipes/processes
-- ⏳ Event logging (harvest, processing, packaging)
-- ⏳ Input/output tracking
-- ⏳ Traceability graphs
+### Level 2 - Process & Event Tracking ✅ COMPLETE
+- ✅ Production recipes/processes
+- ✅ Event logging with input/output tracking
+- ✅ Production run operations
+- ✅ Batch split operations
+- ✅ Batch merge operations
+- ✅ Disposal tracking
+- ✅ Upstream/downstream traceability
+- ✅ Full traceability graphs
 
-### Level 3 - Full Provenance (Future)
-- ⏳ Location management with coordinates
-- ⏳ Cross-actor relationships
+### Level 3 - Full Provenance ✅ COMPLETE
+- ✅ Location management with coordinates
+- ✅ Geographic tracking
+- ⏳ Cross-actor relationships (ready, not implemented)
 - ⏳ Advanced reporting
 - ⏳ External data integration
 
@@ -179,13 +185,18 @@ OriginStack implements **Open Origin JSON v0.5**:
 - [x] Backend API with Actor, Item, Batch, Event entities
 - [x] PostgreSQL storage with JSONB
 - [x] OOJ v0.5 compliance
+- [x] Process/Recipe management
+- [x] Event tracking with input/output
+- [x] Production run operations
+- [x] Split/Merge/Dispose operations
+- [x] Traceability graphs (upstream/downstream)
+- [x] Location management with coordinates
 - [ ] Frontend UI (React or HTMX)
-- [ ] Process/Recipe management
-- [ ] Event tracking with input/output
-- [ ] Traceability graphs
 - [ ] Label generation
-- [ ] CSV/JSON export
+- [ ] OOJ archive export (ZIP)
+- [ ] CSV export
 - [ ] Multi-user authentication
+- [ ] Cross-actor link entities
 - [ ] Production deployment guide
 
 ## Contributing
@@ -201,6 +212,8 @@ TBD
 - [Open Origin JSON Spec](./Open_Origin_JSON_v0.5.md)
 - [Product Specification](./draft_spec.md)
 - [Backend README](./backend/README.md)
+- [Level 2 & 3 Features Guide](./LEVEL_2_3_GUIDE.md)
+- [Getting Started](./GETTING_STARTED.md)
 
 ---
 

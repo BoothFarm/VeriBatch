@@ -41,6 +41,36 @@ GET    /actors/{id}/events        # List events
 GET    /actors/{id}/events/{id}   # Get event
 ```
 
+### Processes (Level 2)
+```bash
+POST   /actors/{id}/processes     # Create process/recipe
+GET    /actors/{id}/processes     # List processes
+GET    /actors/{id}/processes/{id} # Get process
+PUT    /actors/{id}/processes/{id} # Update process
+```
+
+### Operations (Level 2)
+```bash
+POST   /actors/{id}/operations/production-run  # Production run
+POST   /actors/{id}/operations/split-batch     # Split batch
+POST   /actors/{id}/operations/merge-batches   # Merge batches
+POST   /actors/{id}/operations/dispose-batch   # Dispose batch
+```
+
+### Traceability (Level 2)
+```bash
+GET    /actors/{id}/traceability/batches/{id}       # Batch trace
+GET    /actors/{id}/traceability/batches/{id}/graph # Full graph
+GET    /actors/{id}/traceability/items/{id}/summary # Item summary
+```
+
+### Locations (Level 3)
+```bash
+POST   /actors/{id}/locations     # Create location
+GET    /actors/{id}/locations     # List locations
+GET    /actors/{id}/locations/{id} # Get location
+```
+
 ## Example Workflow
 
 ```bash

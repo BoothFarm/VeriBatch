@@ -947,9 +947,12 @@ OOJ does NOT require strict JSON Schema validation.
 
 ---
 
-## 14. Licensing
+---
+## License
 
-OOJ is an open standard and may be implemented freely.
+This specification is licensed under the [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
+
+**Copyright © 2025 Booth Farm Enterprises Ltd.**
 
 ---
 

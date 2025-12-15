@@ -1,10 +1,10 @@
-# OriginStack
+# VeriBatch
 
 **Pass Every Food Safety Inspection with Digital Traceability**
 
-Never worry about recalls or compliance again. OriginStack helps small producers track every batch from farm to shelf with industry-standard digital records.
+Never worry about recalls or compliance again. VeriBatch helps small producers track every batch from farm to shelf with industry-standard digital records.
 
-## Why Producers Choose OriginStack
+## Why Producers Choose VeriBatch
 
 🛡️ **Pass Every Inspection** - Complete digital records ready for FDA, organic, and HACCP auditors  
 ⚡ **Handle Recalls Fast** - Find all affected products in under 30 seconds  
@@ -49,7 +49,7 @@ Never worry about recalls or compliance again. OriginStack helps small producers
 
 ```bash
 # Clone the repository
-cd OriginStack
+cd VeriBatch
 
 # Run setup script (creates database, installs dependencies)
 ./setup.sh
@@ -140,7 +140,7 @@ curl http://localhost:8000/actors/my-farm/batches
 ## Project Structure
 
 ```
-OriginStack/
+VeriBatch/
 ├── backend/
 │   ├── app/
 │   │   ├── api/          # API route handlers
@@ -175,7 +175,7 @@ pytest
 
 ## OOJ Compliance
 
-OriginStack implements **Open Origin JSON v0.5**:
+VeriBatch implements **Open Origin JSON v0.5**:
 - All entities include proper `schema`, `type`, `id` fields
 - Timestamps in ISO 8601 format
 - Extensible with custom fields (forward-compatible)

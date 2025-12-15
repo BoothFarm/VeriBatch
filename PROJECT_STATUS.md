@@ -1,4 +1,4 @@
-# OriginStack - Project Status
+# VeriBatch - Project Status
 
 **Created**: November 19, 2025  
 **Version**: 0.2.0  
@@ -6,7 +6,7 @@
 
 ## What We Built
 
-A functional **FastAPI backend** for OriginStack, an Open Origin JSON (OOJ) v0.5 compliant ERP system for small producers.
+A functional **FastAPI backend** for VeriBatch, an Open Origin JSON (OOJ) v0.5 compliant ERP system for small producers.
 
 ## ✅ Completed Features
 
@@ -182,7 +182,7 @@ Level 3 features implemented:
 ## 📁 File Structure
 
 ```
-OriginStack/
+VeriBatch/
 ├── backend/
 │   ├── app/
 │   │   ├── __init__.py          # Path setup for ooj_client

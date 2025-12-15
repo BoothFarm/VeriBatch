@@ -1,25 +1,27 @@
 """
 Traceability API endpoints (Level 2/3)
 """
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, Annotated
 
 from app.db.database import get_db
 from app.services import traceability_service
+from app.models import database as db_models # Import db_models
+from app.dependencies import get_current_active_user_and_owned_actor # Add this import
 
 router = APIRouter(prefix="/actors/{actor_id}/traceability", tags=["traceability"])
 
 
 @router.get("/batches/{batch_id}")
 def get_batch_trace(
-    actor_id: str,
     batch_id: str,
+    actor: Annotated[db_models.Actor, Depends(get_current_active_user_and_owned_actor)],
+    db: Annotated[Session, Depends(get_db)],
     direction: str = Query("both", regex="^(upstream|downstream|both)$"),
-    db: Session = Depends(get_db)
 ):
     """
-    Get traceability information for a specific batch
+    Get traceability information for a specific batch (Protected)
     
     Query params:
     - direction: "upstream" (inputs), "downstream" (outputs), or "both"
@@ -31,7 +33,7 @@ def get_batch_trace(
     """
     result = traceability_service.get_batch_traceability(
         db=db,
-        actor_id=actor_id,
+        actor_id=actor.id, # Use actor.id from dependency
         batch_id=batch_id,
         direction=direction
     )
@@ -39,22 +41,22 @@ def get_batch_trace(
     if not result["upstream"] and not result["downstream"] and not result["events"]:
         # Check if batch exists
         from app.services import batch_service
-        batch = batch_service.get_batch(db, actor_id, batch_id)
+        batch = batch_service.get_batch(db, actor.id, batch_id) # Use actor.id from dependency
         if not batch:
-            raise HTTPException(status_code=404, detail="Batch not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
     
     return result
 
 
 @router.get("/batches/{batch_id}/graph")
 def get_batch_graph(
-    actor_id: str,
     batch_id: str,
+    actor: Annotated[db_models.Actor, Depends(get_current_active_user_and_owned_actor)],
+    db: Annotated[Session, Depends(get_db)],
     max_depth: int = Query(10, ge=1, le=20),
-    db: Session = Depends(get_db)
 ):
     """
-    Get full traceability graph (tree) for a batch
+    Get full traceability graph (tree) for a batch (Protected)
     
     Query params:
     - max_depth: Maximum recursion depth (default 10, max 20)
@@ -62,13 +64,13 @@ def get_batch_graph(
     Returns a nested tree structure showing all input dependencies
     """
     from app.services import batch_service
-    batch = batch_service.get_batch(db, actor_id, batch_id)
+    batch = batch_service.get_batch(db, actor.id, batch_id) # Use actor.id from dependency
     if not batch:
-        raise HTTPException(status_code=404, detail="Batch not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Batch not found")
     
     graph = traceability_service.get_full_traceability_graph(
         db=db,
-        actor_id=actor_id,
+        actor_id=actor.id, # Use actor.id from dependency
         batch_id=batch_id,
         max_depth=max_depth
     )
@@ -78,22 +80,22 @@ def get_batch_graph(
 
 @router.get("/items/{item_id}/summary")
 def get_item_trace_summary(
-    actor_id: str,
     item_id: str,
-    db: Session = Depends(get_db)
+    actor: Annotated[db_models.Actor, Depends(get_current_active_user_and_owned_actor)],
+    db: Annotated[Session, Depends(get_db)]
 ):
     """
-    Get traceability summary for all batches of an item
+    Get traceability summary for all batches of an item (Protected)
     
     Returns statistics and overview of all batches for this item
     """
     summary = traceability_service.get_item_traceability_summary(
         db=db,
-        actor_id=actor_id,
+        actor_id=actor.id, # Use actor.id from dependency
         item_id=item_id
     )
     
     if summary["total_batches"] == 0:
-        raise HTTPException(status_code=404, detail="No batches found for this item")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No batches found for this item")
     
     return summary

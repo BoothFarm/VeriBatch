@@ -2,7 +2,7 @@
 
 ## Overview
 
-OriginStack v0.2.0 adds **Level 2 (Process & Event Tracking)** and **Level 3 (Full Provenance)** capabilities to the base Level 1 system.
+VeriBatch v0.2.0 adds **Level 2 (Process & Event Tracking)** and **Level 3 (Full Provenance)** capabilities to the base Level 1 system.
 
 ## Level 2: Process & Event Tracking
 

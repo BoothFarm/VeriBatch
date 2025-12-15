@@ -20,6 +20,9 @@ class Actor:
     contacts: Optional[Dict[str, str]] = None
     address: Optional[Dict[str, str]] = None
     certifications: List[str] = field(default_factory=list)
+    sfcr_license_id: Optional[str] = None
+    recall_contact_name: Optional[str] = None
+    recall_phone: Optional[str] = None
     external_ids: Optional[ExternalIds] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
@@ -39,6 +42,12 @@ class Actor:
             data["address"] = self.address
         if self.certifications:
             data["certifications"] = self.certifications
+        if self.sfcr_license_id:
+            data["sfcr_license_id"] = self.sfcr_license_id
+        if self.recall_contact_name:
+            data["recall_contact_name"] = self.recall_contact_name
+        if self.recall_phone:
+            data["recall_phone"] = self.recall_phone
         if self.external_ids:
             data["external_ids"] = self.external_ids.to_dict()
         if self.created_at:
@@ -56,6 +65,9 @@ class Actor:
             contacts=data.get("contacts"),
             address=data.get("address"),
             certifications=data.get("certifications", []),
+            sfcr_license_id=data.get("sfcr_license_id"),
+            recall_contact_name=data.get("recall_contact_name"),
+            recall_phone=data.get("recall_phone"),
             external_ids=ExternalIds.from_dict(data["external_ids"]) if "external_ids" in data else None,
             created_at=data.get("created_at"),
             updated_at=data.get("updated_at"),
@@ -178,6 +190,11 @@ class Batch:
     production_date: Optional[str] = None
     expiration_date: Optional[str] = None
     best_before_date: Optional[str] = None
+    notes: Optional[str] = None
+    lot_code: Optional[str] = None
+    external_lot_code: Optional[str] = None
+    is_mock_recall: bool = False
+    unit_cost: Optional[Dict[str, Any]] = None
     external_ids: Optional[ExternalIds] = None
     attachments: List[Attachment] = field(default_factory=list)
     created_at: Optional[str] = None
@@ -214,10 +231,16 @@ class Batch:
             data["expiration_date"] = self.expiration_date
         if self.best_before_date:
             data["best_before_date"] = self.best_before_date
+        if self.unit_cost:
+            data["unit_cost"] = self.unit_cost
         if self.external_ids:
             data["external_ids"] = self.external_ids.to_dict()
         if self.attachments:
             data["attachments"] = [a.to_dict() for a in self.attachments]
+        if self.external_lot_code:
+            data["external_lot_code"] = self.external_lot_code
+        if self.is_mock_recall:
+            data["is_mock_recall"] = self.is_mock_recall
         if self.created_at:
             data["created_at"] = self.created_at
         if self.updated_at:
@@ -237,6 +260,9 @@ class Batch:
             production_date=data.get("production_date"),
             expiration_date=data.get("expiration_date"),
             best_before_date=data.get("best_before_date"),
+            unit_cost=data.get("unit_cost"),
+            external_lot_code=data.get("external_lot_code"),
+            is_mock_recall=data.get("is_mock_recall", False),
             external_ids=ExternalIds.from_dict(data["external_ids"]) if "external_ids" in data else None,
             attachments=[Attachment.from_dict(a) for a in data.get("attachments", [])],
             created_at=data.get("created_at"),
@@ -316,6 +342,7 @@ class Event:
     inputs: List[BatchInput] = field(default_factory=list)
     outputs: List[BatchOutput] = field(default_factory=list)
     packaging_materials: List[BatchInput] = field(default_factory=list)
+    waste: Optional[Quantity] = None
     notes: Optional[str] = None
     performed_by: Optional[str] = None
     external_ids: Optional[ExternalIds] = None
@@ -326,7 +353,7 @@ class Event:
     VALID_EVENT_TYPES = {
         "harvest", "processing", "packaging", "receiving",
         "shipping", "storage_move", "quality_check",
-        "split", "merge", "disposal",
+        "split", "merge", "disposal", "planting", "application",
     }
 
     def __post_init__(self):
@@ -356,6 +383,8 @@ class Event:
             data["outputs"] = [o.to_dict() for o in self.outputs]
         if self.packaging_materials:
             data["packaging_materials"] = [p.to_dict() for p in self.packaging_materials]
+        if self.waste:
+            data["waste"] = self.waste.to_dict()
         if self.notes:
             data["notes"] = self.notes
         if self.performed_by:
@@ -382,6 +411,7 @@ class Event:
             inputs=[BatchInput.from_dict(i) for i in data.get("inputs", [])],
             outputs=[BatchOutput.from_dict(o) for o in data.get("outputs", [])],
             packaging_materials=[BatchInput.from_dict(p) for p in data.get("packaging_materials", [])],
+            waste=Quantity.from_dict(data["waste"]) if "waste" in data else None,
             notes=data.get("notes"),
             performed_by=data.get("performed_by"),
             external_ids=ExternalIds.from_dict(data["external_ids"]) if "external_ids" in data else None,

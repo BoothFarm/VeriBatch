@@ -1,18 +1,18 @@
 """
-OriginStack - Open Origin JSON ERP System
+VeriBatch - Open Origin JSON ERP System
 FastAPI main application
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import actors, items, batches, events, processes, locations, operations, traceability, export, frontend
+from app.api import actors, items, batches, events, processes, locations, operations, traceability, export, frontend, auth, compliance
 from app.db.database import engine, Base
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="OriginStack",
-    description="Open Origin JSON ERP for small producers - Levels 1, 2 & 3",
+    title="VeriBatch",
+    description="From the Berry Patch to VeriBatch. Simple, accessible compliance for small producers.",
     version="0.2.0"
 )
 
@@ -35,6 +35,10 @@ app.include_router(operations.router, prefix="/api")
 app.include_router(traceability.router, prefix="/api")
 app.include_router(locations.router, prefix="/api")
 app.include_router(export.router, prefix="/api")
+app.include_router(compliance.router, prefix="/api")
+
+# Auth routes (no prefix as they are specific endpoints like /login, /register)
+app.include_router(auth.router)
 
 # Frontend routes (no prefix - these are the default)
 app.include_router(frontend.router)
@@ -43,10 +47,10 @@ app.include_router(frontend.router)
 @app.get("/api")
 def api_info():
     return {
-        "name": "OriginStack API",
+        "name": "VeriBatch API",
         "version": "0.2.0",
         "schema": "open-origin-json/0.5",
-        "description": "Open Origin JSON ERP API for small producers",
+        "description": "From the Berry Patch to VeriBatch. Simple compliance for small producers.",
         "levels": {
             "1": "Minimal Traceability (Actors, Items, Batches)",
             "2": "Process & Event Tracking (Processes, Operations, Traceability)",

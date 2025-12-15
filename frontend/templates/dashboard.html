@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - OriginStack{% endblock %}
+{% block title %}Dashboard - VeriBatch{% endblock %}
 
 {% block content %}
 
@@ -8,26 +8,26 @@
 <!-- First-time setup -->
 <div class="max-w-2xl mx-auto py-12">
     <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">🎉 Welcome to OriginStack!</h1>
-        <p class="text-xl text-gray-600">Let's get your farm or business set up for traceability tracking.</p>
+        <h1 class="text-4xl font-bold text-gray-900 mb-4 font-serif">🎉 Welcome to VeriBatch!</h1>
+        <p class="text-xl text-gray-600">Let's organize your berry patch (or kitchen).</p>
     </div>
     
-    <div class="bg-white rounded-xl shadow-lg p-8">
-        <h2 class="text-2xl font-semibold mb-6">Step 1: Create Your Business Profile</h2>
+    <div class="bg-white rounded-xl shadow-lg p-8 border border-green-100">
+        <h2 class="text-2xl font-semibold mb-6 text-green-800">Step 1: Create Your Farm Profile</h2>
         
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-            <h3 class="font-semibold text-blue-900 mb-2">What you'll track:</h3>
-            <ul class="text-blue-800 space-y-1">
-                <li>• Your products and ingredients</li>
-                <li>• Batch/lot codes with dates</li>
-                <li>• Production processes</li>
-                <li>• Full traceability from farm to shelf</li>
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+            <h3 class="font-semibold text-green-900 mb-2">What you'll track:</h3>
+            <ul class="text-green-800 space-y-2">
+                <li>🌱 <strong>Your harvest & ingredients</strong></li>
+                <li>🏷️ <strong>Batch codes (automatically)</strong></li>
+                <li>📝 <strong>Your recipes & processes</strong></li>
+                <li>📖 <strong>The full story from soil to sale</strong></li>
             </ul>
         </div>
         
         <div class="text-center">
-            <a href="/actors/new" class="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition inline-block">
-                Create Your Business Profile →
+            <a href="/actors/new" class="bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-800 transition inline-block shadow-md">
+                Start Your Journey →
             </a>
             <p class="text-sm text-gray-500 mt-3">Takes less than 2 minutes</p>
         </div>
@@ -38,14 +38,31 @@
 
 <!-- Header with business info -->
 <div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl p-8 mb-8">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold">{{ stats.actor.name }}</h1>
             <p class="text-green-100 mt-1">Production Dashboard</p>
         </div>
-        <div class="text-right">
-            <div class="text-2xl font-bold">{{ stats.active_batches }}</div>
-            <div class="text-sm text-green-100">Active Batches</div>
+        
+        <div class="flex items-center gap-6">
+            {% if actors|length > 1 %}
+            <form action="/dashboard" method="GET">
+                <label for="actor_switch" class="sr-only">Switch Farm</label>
+                <select id="actor_switch" name="actor_id" onchange="this.form.submit()" 
+                        class="text-sm bg-green-800 border border-green-500 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 cursor-pointer shadow-sm hover:bg-green-700 transition">
+                    {% for a in actors %}
+                    <option value="{{ a.id }}" {% if a.id == current_actor_id %}selected{% endif %}>
+                        {{ a.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+            
+            <div class="text-right border-l border-green-500 pl-6">
+                <div class="text-3xl font-bold leading-none">{{ stats.active_batches }}</div>
+                <div class="text-sm text-green-100 font-medium">Active Batches</div>
+            </div>
         </div>
     </div>
 </div>
@@ -135,6 +152,14 @@
             Quick Actions
         </h3>
         <div class="space-y-3">
+            <a href="/actors/{{ stats.actor.id }}/events/new?event_type=planting" 
+               class="block bg-green-700 text-white px-4 py-2 rounded text-sm font-medium hover:bg-green-800 transition text-center">
+                🌱 Log Planting
+            </a>
+            <a href="/actors/{{ stats.actor.id }}/harvest/new" 
+               class="block bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-orange-700 transition text-center">
+                🧺 Log Harvest
+            </a>
             <a href="/actors/{{ stats.actor.id }}/batches/new" 
                class="block bg-green-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-green-700 transition text-center">
                 + New Batch
@@ -212,7 +237,7 @@
             Reports & Export
         </h3>
         <div class="space-y-2">
-            <a href="/actors/{{ stats.actor.id }}/export/ooj-archive" 
+            <a href="/api/actors/{{ stats.actor.id }}/export/ooj-archive" 
                class="block bg-amber-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-amber-700 transition text-center">
                 Export All Data
             </a>
@@ -234,7 +259,7 @@
         Your traceability system meets food safety requirements. 
         Export reports instantly when inspectors arrive.
     </p>
-    <a href="/actors/{{ stats.actor.id }}/export/ooj-archive" 
+    <a href="/api/actors/{{ stats.actor.id }}/export/ooj-archive" 
        class="bg-white text-blue-600 px-6 py-2 rounded font-semibold hover:bg-gray-100 transition">
         Generate Inspection Report →
     </a>

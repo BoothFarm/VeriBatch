@@ -1,26 +1,28 @@
 """
 Advanced batch operations API (Level 2)
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import Dict, Any
+from typing import Dict, Any, Annotated
 from datetime import datetime
 
 from app.db.database import get_db
 from app.services import event_service
 from app.services.validation import ValidationError
+from app.models import database as db_models
+from app.dependencies import get_current_active_user_and_owned_actor # Add this import
 
 router = APIRouter(prefix="/actors/{actor_id}/operations", tags=["operations"])
 
 
 @router.post("/split-batch", response_model=dict)
 def split_batch_operation(
-    actor_id: str,
     operation: Dict[str, Any],
-    db: Session = Depends(get_db)
+    actor: Annotated[db_models.Actor, Depends(get_current_active_user_and_owned_actor)],
+    db: Annotated[Session, Depends(get_db)]
 ):
     """
-    Split a batch into multiple batches
+    Split a batch into multiple batches (Protected)
     
     Body:
     {
@@ -38,7 +40,7 @@ def split_batch_operation(
         event = event_service.split_batch(
             db=db,
             event_id=operation["event_id"],
-            actor_id=actor_id,
+            actor_id=actor.id, # Use actor.id from dependency
             source_batch_id=operation["source_batch_id"],
             output_batches=operation["outputs"],
             location_id=operation.get("location_id"),
@@ -47,21 +49,21 @@ def split_batch_operation(
         )
         return event.jsonb_doc
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except KeyError as e:
-        raise HTTPException(status_code=400, detail=f"Missing required field: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Missing required field: {e}")
 
 
 @router.post("/merge-batches", response_model=dict)
 def merge_batches_operation(
-    actor_id: str,
     operation: Dict[str, Any],
-    db: Session = Depends(get_db)
+    actor: Annotated[db_models.Actor, Depends(get_current_active_user_and_owned_actor)],
+    db: Annotated[Session, Depends(get_db)]
 ):
     """
-    Merge multiple batches into one
+    Merge multiple batches into one (Protected)
     
     Body:
     {
@@ -77,7 +79,7 @@ def merge_batches_operation(
         event = event_service.merge_batches(
             db=db,
             event_id=operation["event_id"],
-            actor_id=actor_id,
+            actor_id=actor.id, # Use actor.id from dependency
             source_batch_ids=operation["source_batch_ids"],
             output_batch_id=operation["output_batch_id"],
             output_quantity=operation["output_quantity"],
@@ -87,21 +89,21 @@ def merge_batches_operation(
         )
         return event.jsonb_doc
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except KeyError as e:
-        raise HTTPException(status_code=400, detail=f"Missing required field: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Missing required field: {e}")
 
 
 @router.post("/dispose-batch", response_model=dict)
 def dispose_batch_operation(
-    actor_id: str,
     operation: Dict[str, Any],
-    db: Session = Depends(get_db)
+    actor: Annotated[db_models.Actor, Depends(get_current_active_user_and_owned_actor)],
+    db: Annotated[Session, Depends(get_db)]
 ):
     """
-    Dispose of a batch
+    Dispose of a batch (Protected)
     
     Body:
     {
@@ -116,7 +118,7 @@ def dispose_batch_operation(
         event = event_service.dispose_batch(
             db=db,
             event_id=operation["event_id"],
-            actor_id=actor_id,
+            actor_id=actor.id, # Use actor.id from dependency
             batch_id=operation["batch_id"],
             reason=operation["reason"],
             location_id=operation.get("location_id"),
@@ -125,21 +127,21 @@ def dispose_batch_operation(
         )
         return event.jsonb_doc
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except KeyError as e:
-        raise HTTPException(status_code=400, detail=f"Missing required field: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Missing required field: {e}")
 
 
 @router.post("/production-run", response_model=dict)
 def production_run_operation(
-    actor_id: str,
     operation: Dict[str, Any],
-    db: Session = Depends(get_db)
+    actor: Annotated[db_models.Actor, Depends(get_current_active_user_and_owned_actor)],
+    db: Annotated[Session, Depends(get_db)]
 ):
     """
-    Record a complete production run
+    Record a complete production run (Protected)
     
     Body:
     {
@@ -163,7 +165,7 @@ def production_run_operation(
         event = event_service.record_processing_event(
             db=db,
             event_id=operation["event_id"],
-            actor_id=actor_id,
+            actor_id=actor.id, # Use actor.id from dependency
             process_id=operation.get("process_id"),
             inputs=operation["inputs"],
             outputs=operation["outputs"],
@@ -175,8 +177,8 @@ def production_run_operation(
         )
         return event.jsonb_doc
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except KeyError as e:
-        raise HTTPException(status_code=400, detail=f"Missing required field: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Missing required field: {e}")

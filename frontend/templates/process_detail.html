@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}{{ process.name }} - OriginStack{% endblock %}
+{% block title %}{{ process.name }} - VeriBatch{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">{{ process.name }}</h1>
-    <p class="text-gray-600 mt-2">Process Details</p>
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900">{{ process.name }}</h1>
+        <p class="text-gray-600 mt-2">Process Details</p>
+    </div>
+    <a href="/actors/{{ actor_id }}/processes/{{ process.id }}/edit" 
+       class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center shadow-sm">
+        ✏️ Edit Process
+    </a>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

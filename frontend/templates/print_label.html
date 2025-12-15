@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Label: {{ batch.id }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
+    <style>
+        /* CSS Reset for precise printing */
+        @media print {
+            @page { size: 4in 2in; margin: 0; }
+            body { margin: 0; padding: 0; }
+            .no-print { display: none; }
+        }
+        
+        body { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            width: 4in; 
+            height: 2in; 
+            overflow: hidden; 
+            box-sizing: border-box;
+            border: 1px dotted #ccc; /* Border helps visualize on screen, disappears in production */
+            display: flex;
+            background: white;
+        }
+
+        /* --- LEFT PANEL: Principal Display Panel (60%) --- */
+        .pdp {
+            width: 60%;
+            padding: 0.12in;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px dashed #000;
+            position: relative;
+        }
+
+        .pdp-header { margin-bottom: 5px; }
+        
+        .pdp-middle { 
+            flex-grow: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+
+        .pdp-footer { margin-top: auto; }
+
+        /* Typography */
+        h1 { 
+            font-size: 14pt; 
+            font-weight: 900; 
+            margin: 0; 
+            line-height: 1.1; 
+            text-transform: uppercase; 
+            word-wrap: break-word; /* Handle long names */
+        }
+        .french-name { font-size: 10pt; font-style: italic; color: #444; margin-top: 2px; }
+
+        /* Logo Placeholder */
+        .logo-placeholder {
+            border: 1px dashed #ddd;
+            color: #ccc;
+            width: 80%;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8pt;
+            border-radius: 4px;
+        }
+        
+        .real-logo { max-height: 45px; max-width: 90%; display: none; }
+
+        .net-quantity { font-size: 13pt; font-weight: bold; }
+        .origin { font-size: 6pt; text-transform: uppercase; margin-top: 2px; }
+
+        /* --- RIGHT PANEL: Info & Traceability (40%) --- */
+        .info {
+            width: 40%;
+            padding: 0.05in;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .dealer-block { 
+            font-size: 5.5pt; 
+            line-height: 1.1; 
+            margin-bottom: 2px;
+            width: 100%;
+        }
+        
+        .lot-code { 
+            font-size: 6pt; 
+            font-family: 'Courier New', monospace; 
+            font-weight: bold; 
+            margin: 1px 0; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        /* Barcode adjustments for visibility */
+        #barcode { 
+            width: 98%; 
+            height: auto; 
+            max-height: 0.6in;
+            display: block;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="pdp">
+        <div class="pdp-header">
+            <h1>{{ item.name }}</h1>
+            <div class="french-name">
+                {% if item.jsonb_doc.get('french_name') %}
+                    {{ item.jsonb_doc.get('french_name') }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="pdp-middle">
+            {% if actor.jsonb_doc.get('logo_url') %}
+                <img src="{{ actor.jsonb_doc.get('logo_url') }}" class="real-logo" style="display:block;">
+            {% else %}
+                <div class="logo-placeholder">Logo Area</div>
+            {% endif %}
+        </div>
+
+        <div class="pdp-footer">
+            <div class="net-quantity">
+                {% if batch.jsonb_doc.get('quantity') %}
+                    {{ batch.jsonb_doc.get('quantity').amount }} {{ batch.jsonb_doc.get('quantity').unit }}
+                {% else %}
+                    <span style="color: red; font-size: 10pt;">QTY MISSING</span>
+                {% endif %}
+            </div>
+            <div class="origin">
+                {% if item.jsonb_doc.get('origin') %}
+                    {{ item.jsonb_doc.get('origin') }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="info">
+        <div class="dealer-block">
+            <strong>{{ actor.name }}</strong><br>
+            {% if actor.jsonb_doc.get('address') %}
+                {{ actor.jsonb_doc.address.get('street', '') }}<br>
+                {{ actor.jsonb_doc.address.get('city', '') }}, {{ actor.jsonb_doc.address.get('region', '') }} {{ actor.jsonb_doc.address.get('postal_code', '') }}
+            {% endif %}
+        </div>
+
+        <div id="qrcode"></div>
+
+        <div class="lot-code">
+            LOT: {{ batch.jsonb_doc.get('lot_code', batch.id) }}
+        </div>
+
+        <svg id="barcode"></svg>
+    </div>
+
+    <div class="no-print" style="position: fixed; bottom: 10px; right: 10px;">
+        <button onclick="window.print()" style="background: green; color: white; padding: 10px 20px; border: none; font-size: 14px; cursor: pointer; border-radius: 5px;">🖨️ Print Label</button>
+        <a href="/actors/{{ actor.id }}/batches/{{ batch.id }}/print_label/pdf" style="background: blue; color: white; padding: 10px 20px; border: none; font-size: 14px; cursor: pointer; border-radius: 5px;">📄 Download PDF</a>
+    </div>
+
+    <script type="text/javascript">
+        // 1. Generate QR Code (Traceability)
+        var publicUrl = "{{ public_url }}";
+
+        new QRCode(document.getElementById("qrcode"), {
+            text: publicUrl,
+            width: 60,  
+            height: 60,
+            correctLevel : QRCode.CorrectLevel.L
+        });
+
+        // 2. Generate Barcode (Retail/UPC or Internal Code 128)
+        var upcCode = "{{ item.jsonb_doc.get('external_ids', {}).get('upc') or item.jsonb_doc.get('external_ids', {}).get('gtin') }}";
+        var batchId = "{{ batch.id }}";
+        
+        // Detect if we have a valid 11 or 12 digit UPC
+        var isRetail = upcCode && /^\d{11,12}$/.test(upcCode) && upcCode !== '000000000000';
+        
+        if (isRetail) {
+            JsBarcode("#barcode", upcCode, {
+                format: "UPC",
+                lineColor: "#000",
+                width: 2,
+                height: 45,
+                displayValue: true,
+                fontSize: 9,
+                margin: 0
+            });
+        } else {
+            // Fallback to Code 128 for internal tracking
+            JsBarcode("#barcode", batchId, {
+                format: "CODE128",
+                lineColor: "#000",
+                width: 1.5,
+                height: 40,
+                displayValue: false,
+                margin: 0
+            });
+        }
+    </script>
+</body>
+</html>

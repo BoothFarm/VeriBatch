@@ -1,5 +1,5 @@
 """
-Basic tests for OriginStack API
+Basic tests for VeriBatch API
 """
 import sys
 from pathlib import Path
@@ -13,10 +13,10 @@ client = TestClient(app)
 
 def test_root():
     """Test root endpoint"""
-    response = client.get("/")
+    response = client.get("/api")
     assert response.status_code == 200
     data = response.json()
-    assert data["name"] == "OriginStack"
+    assert data["name"] == "VeriBatch API"
     assert "open-origin-json" in data["schema"]
 
 

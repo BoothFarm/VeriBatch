@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Setting up OriginStack..."
+echo "🚀 Setting up VeriBatch..."
 
 # Check if PostgreSQL is installed
 if ! command -v psql &> /dev/null; then

@@ -1,4 +1,4 @@
-# OriginStack Quick Reference
+# VeriBatch Quick Reference
 
 ## Start the Server
 

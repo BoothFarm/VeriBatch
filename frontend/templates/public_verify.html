@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Verification</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .verified-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4 max-w-lg">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-center mb-4">
+                <h1 class="text-2xl font-bold">{{ item.name }}</h1>
+                <p class="text-gray-600">From: {{ actor.name }}</p>
+            </div>
+            <div class="text-center mb-4">
+                <div class="verified-badge">
+                    Verified Authentic
+                </div>
+            </div>
+            <div class="mb-4">
+                <p class="text-lg font-semibold">Batch ID: {{ batch.id }}</p>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold mb-2">Traceability Timeline</h2>
+                <ul class="timeline">
+                    {% for event in events %}
+                    <li>
+                        <div class="flex items-start mb-4">
+                            <div class="bg-blue-500 rounded-full h-4 w-4 mr-3 mt-1"></div>
+                            <div>
+                                <p class="font-semibold">{{ event.event_type.replace('_', ' ')|title }}</p>
+                                <p class="text-gray-500 text-sm">{{ event.timestamp.strftime('%Y-%m-%d %H:%M:%S') if event.timestamp else '' }}</p>
+                                
+                                {% if event.inputs %}
+                                <div class="mt-2">
+                                    <p class="text-xs font-semibold text-gray-600">Inputs:</p>
+                                    <ul class="list-disc list-inside ml-2">
+                                        {% for input in event.inputs %}
+                                        <li class="text-xs text-gray-700">{{ input.batch_id }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+
+                                {% if event.outputs %}
+                                <div class="mt-2">
+                                    <p class="text-xs font-semibold text-gray-600">Outputs:</p>
+                                    <ul class="list-disc list-inside ml-2">
+                                        {% for output in event.outputs %}
+                                        <li class="text-xs text-gray-700">{{ output.batch_id }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% if location and location.jsonb_doc and location.jsonb_doc.latitude and location.jsonb_doc.longitude %}
+            <div class="mt-4">
+                <h2 class="text-xl font-bold mb-2">Origin Location</h2>
+                <div id="map" style="height: 300px;" class="rounded-lg"></div>
+                <script>
+                    function initMap() {
+                        var lat = {{ location.jsonb_doc.latitude }};
+                        var lng = {{ location.jsonb_doc.longitude }};
+                        var myLatLng = { lat: lat, lng: lng };
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 15,
+                            center: myLatLng
+                        });
+                        var marker = new google.maps.Marker({
+                            position: myLatLng,
+                            map: map,
+                            title: 'Origin Location'
+                        });
+                    }
+                </script>
+                <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

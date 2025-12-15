@@ -2,7 +2,7 @@
 Service layer for batch operations
 """
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from sqlalchemy.orm import Session
 from app.models import database as db_models
 from ooj_client import entities
@@ -54,6 +54,9 @@ def create_batch(
         jsonb_doc=batch.to_dict()
     )
     
+    if "is_mock_recall" in kwargs:
+        db_batch.is_mock_recall = kwargs["is_mock_recall"]
+    
     db.add(db_batch)
     db.commit()
     db.refresh(db_batch)
@@ -65,17 +68,22 @@ def get_batches_by_actor(
     db: Session,
     actor_id: str,
     status: Optional[str] = None,
-    item_id: Optional[str] = None
-) -> List[db_models.Batch]:
-    """Get all batches for an actor with optional filters"""
+    item_id: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+) -> Tuple[List[db_models.Batch], int]:
+    """Get batches with filters and pagination"""
     query = db.query(db_models.Batch).filter(db_models.Batch.actor_id == actor_id)
     
     if status:
         query = query.filter(db_models.Batch.status == status)
     if item_id:
         query = query.filter(db_models.Batch.item_id == item_id)
+        
+    total = query.count()
+    items = query.order_by(db_models.Batch.production_date.desc()).offset(skip).limit(limit).all()
     
-    return query.all()
+    return items, total
 
 
 def get_batch(db: Session, actor_id: str, batch_id: str) -> Optional[db_models.Batch]:
@@ -101,6 +109,61 @@ def update_batch_status(
     doc = batch.jsonb_doc
     doc['status'] = new_status
     doc['updated_at'] = datetime.utcnow().isoformat() + "Z"
+    batch.jsonb_doc = doc
+    
+    db.commit()
+    db.refresh(batch)
+    
+    return batch
+
+
+def update_batch_details(
+    db: Session,
+    actor_id: str,
+    batch_id: str,
+    data: dict
+) -> db_models.Batch:
+    """Update batch details (quantity, dates, notes, etc.)"""
+    batch = get_batch(db, actor_id, batch_id)
+    if not batch:
+        return None
+    
+    doc = batch.jsonb_doc.copy()
+    
+    # Update fields if present in data
+    if "production_date" in data:
+        batch.production_date = data["production_date"]
+        doc["production_date"] = data["production_date"]
+        
+    if "expiration_date" in data:
+        batch.expiration_date = data["expiration_date"]
+        doc["expiration_date"] = data["expiration_date"]
+        
+    if "status" in data:
+        batch.status = data["status"]
+        doc["status"] = data["status"]
+        
+    # JSON-only fields
+    if "quantity" in data:
+        doc["quantity"] = data["quantity"]
+        
+    if "origin_kind" in data:
+        doc["origin_kind"] = data["origin_kind"]
+        
+    if "notes" in data:
+        doc["notes"] = data["notes"]
+        
+    if "lot_code" in data:
+        doc["lot_code"] = data["lot_code"]
+        
+    if "external_lot_code" in data:
+        doc["external_lot_code"] = data["external_lot_code"]
+        
+    if "is_mock_recall" in data:
+        batch.is_mock_recall = data["is_mock_recall"]
+        doc["is_mock_recall"] = data["is_mock_recall"]
+
+    doc["updated_at"] = datetime.utcnow().isoformat() + "Z"
     batch.jsonb_doc = doc
     
     db.commit()

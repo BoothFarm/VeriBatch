@@ -1,4 +1,4 @@
-# OriginStack UX Improvements
+# VeriBatch UX Improvements
 
 ## Value Proposition Reframe
 
@@ -139,8 +139,8 @@ Every page now emphasizes:
 3. **Data export/ownership**
 4. **Regulatory compliance**
 
-This positions OriginStack as a compliance tool first, technical platform second - which is what producers actually care about.
+This positions VeriBatch as a compliance tool first, technical platform second - which is what producers actually care about.
 
 ## Results
 
-These changes transform OriginStack from a "developer built this for producers" feel to a "producers will actually want to use this" experience. The value proposition is clear, the language is familiar, and the benefits are obvious from the first interaction.
+These changes transform VeriBatch from a "developer built this for producers" feel to a "producers will actually want to use this" experience. The value proposition is clear, the language is familiar, and the benefits are obvious from the first interaction.

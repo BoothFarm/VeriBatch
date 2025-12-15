@@ -1,6 +1,6 @@
-# Getting Started with OriginStack
+# Getting Started with VeriBatch
 
-This guide will help you get OriginStack up and running on your local machine.
+This guide will help you get VeriBatch up and running on your local machine.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ This guide will help you get OriginStack up and running on your local machine.
 
 ### 1. Verify OpenOriginJSON is Present
 
-OriginStack depends on the `ooj_client` library from OpenOriginJSON:
+VeriBatch depends on the `ooj_client` library from OpenOriginJSON:
 
 ```bash
 # From BoothFarmEnterprises directory
@@ -52,7 +52,7 @@ GRANT ALL PRIVILEGES ON DATABASE originstack TO originstack;
 ### 3. Set Up Python Environment
 
 ```bash
-cd OriginStack/backend
+cd VeriBatch/backend
 
 # Create virtual environment
 python3 -m venv venv
@@ -239,7 +239,7 @@ psql -U originstack -d originstack -h localhost
 **Solution**: Make sure OpenOriginJSON is in the parent directory:
 
 ```bash
-# From OriginStack directory
+# From VeriBatch directory
 ls ../OpenOriginJSON/ooj_client
 ```
 

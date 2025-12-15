@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'create' %}New Label Template{% else %}Edit Label Template{% endif %} - VeriBatch{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">
+        {% if mode == 'create' %}Create New Label Template{% else %}Edit Label Template: <span class="font-mono">{{ template.id }}</span>{% endif %}
+    </h1>
+    <p class="text-gray-600 mt-2">Design custom labels for your products</p>
+</div>
+
+<div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+    <form id="label-template-form" method="POST" action="{% if mode == 'create' %}/actors/{{ actor_id }}/labels/create{% else %}/actors/{{ actor_id }}/labels/{{ template.id }}/update{% endif %}">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left Column: Controls & Inspector -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Template Settings -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h2 class="text-lg font-semibold mb-3">Template Settings</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Template ID *</label>
+                            <input type="text" name="id" value="{{ template.id if template else '' }}" 
+                                   {% if mode == 'edit' %}readonly{% endif %}
+                                   class="mt-1 w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-sm {% if mode == 'edit' %}bg-gray-100{% endif %}"
+                                   required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Name *</label>
+                            <input type="text" name="name" value="{{ template.name if template else '' }}" 
+                                   class="mt-1 w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-sm"
+                                   required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Width (in) *</label>
+                                <input type="number" step="0.01" name="width_in" id="width_in" value="{{ template.width_in if template else '4.0' }}" 
+                                       class="mt-1 w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-sm"
+                                       required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Height (in) *</label>
+                                <input type="number" step="0.01" name="height_in" id="height_in" value="{{ template.height_in if template else '2.0' }}" 
+                                       class="mt-1 w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-sm"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Elements -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h2 class="text-lg font-semibold mb-3">Add Elements</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" id="add-text" class="text-sm p-2 bg-gray-200 hover:bg-gray-300 rounded">Add Text</button>
+                        <button type="button" id="add-image" class="text-sm p-2 bg-gray-200 hover:bg-gray-300 rounded">Add Image</button>
+                        <button type="button" id="add-barcode" class="text-sm p-2 bg-gray-200 hover:bg-gray-300 rounded">Barcode</button>
+                        <button type="button" id="add-qrcode" class="text-sm p-2 bg-gray-200 hover:bg-gray-300 rounded">QR Code</button>
+                    </div>
+                </div>
+
+                <!-- Inspector Panel -->
+                <div id="inspector" class="bg-white rounded-lg shadow p-4 hidden">
+                    <h2 class="text-lg font-semibold mb-3">Properties</h2>
+                    <div id="inspector-content" class="space-y-3"></div>
+                    <button type="button" id="delete-element" class="mt-4 text-sm w-full p-2 bg-red-500 text-white hover:bg-red-600 rounded">Delete Selected</button>
+                </div>
+                 <!-- Actions -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex gap-3">
+                        <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            {% if mode == 'create' %}Create Template{% else %}Update Template{% endif %}
+                        </button>
+                        <a href="/actors/{{ actor_id }}/labels" class="w-full text-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Canvas Editor -->
+            <div class="lg:col-span-3 bg-gray-100 rounded-lg shadow-inner p-4 flex justify-center items-center" style="min-height: 70vh;">
+                <canvas id="label-canvas" class="border bg-white shadow-lg"></canvas>
+            </div>
+        </div>
+        <!-- Hidden Elements JSON -->
+        <textarea name="elements_json" id="elements_json" class="hidden">{{ template.jsonb_doc.elements_json if template and template.jsonb_doc.elements_json else '[]' }}</textarea>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("DOM fully loaded and parsed");
+
+    const dpi = 96;
+    const widthInput = document.getElementById('width_in');
+    const heightInput = document.getElementById('height_in');
+    const elementsTextarea = document.getElementById('elements_json');
+    const form = document.getElementById('label-template-form');
+
+    const inspector = document.getElementById('inspector');
+    const inspectorContent = document.getElementById('inspector-content');
+
+    const canvas = new fabric.Canvas('label-canvas', {
+        backgroundColor: '#fff',
+        selection: true
+    });
+    console.log("Fabric canvas initialized", canvas);
+
+
+    // --- UTILITY FUNCTIONS ---
+    function inchesToPixels(inches) { return inches * dpi; }
+    function pixelsToInches(pixels) { return pixels / dpi; }
+
+    function resizeCanvas() {
+        const widthIn = parseFloat(widthInput.value) || 4;
+        const heightIn = parseFloat(heightInput.value) || 2;
+        canvas.setWidth(inchesToPixels(widthIn));
+        canvas.setHeight(inchesToPixels(heightIn));
+        canvas.renderAll();
+    }
+    
+    // --- ELEMENT CREATION ---
+    document.getElementById('add-text').addEventListener('click', () => {
+        console.log("Add Text button clicked");
+        const text = new fabric.Textbox('New Text', {
+            left: canvas.getWidth() / 2 - 75, 
+            top: canvas.getHeight() / 2 - 10, 
+            width: 150, 
+            fontSize: 20,
+            fontFamily: 'Helvetica',
+            custom_type: 'text',
+            custom_data: { text: 'New Text', data_source: '' }
+        });
+        canvas.add(text);
+        canvas.setActiveObject(text);
+        canvas.renderAll();
+    });
+
+    function createPlaceholder(type, width, height, data) {
+        const rect = new fabric.Rect({
+            width: width, height: height,
+            fill: '#f0f0f0', stroke: '#ccc', strokeWidth: 1,
+            originX: 'center', originY: 'center'
+        });
+        const text = new fabric.Textbox(type.toUpperCase(), {
+            fontSize: 16,
+            fontFamily: 'Helvetica',
+            fill: '#333',
+            textAlign: 'center',
+            originX: 'center', originY: 'center',
+            width: width - 10
+        });
+        const group = new fabric.Group([rect, text], {
+            left: canvas.getWidth() / 2 - width / 2,
+            top: canvas.getHeight() / 2 - height / 2,
+            custom_type: type,
+            custom_data: data
+        });
+        return group;
+    }
+
+    document.getElementById('add-image').addEventListener('click', () => {
+        console.log("Add Image button clicked");
+        const imgPlaceholder = createPlaceholder('image', 100, 100, { src: '', data_source: '' });
+        canvas.add(imgPlaceholder);
+        canvas.setActiveObject(imgPlaceholder);
+        canvas.renderAll();
+    });
+
+    document.getElementById('add-barcode').addEventListener('click', () => {
+        console.log("Add Barcode button clicked");
+        const barcodePlaceholder = createPlaceholder('barcode', 150, 50, { data: '123456789', barcode_type: 'code128', data_source: '' });
+        canvas.add(barcodePlaceholder);
+        canvas.setActiveObject(barcodePlaceholder);
+        canvas.renderAll();
+    });
+
+    document.getElementById('add-qrcode').addEventListener('click', () => {
+        console.log("Add QR Code button clicked");
+        const qrcodePlaceholder = createPlaceholder('qrcode', 100, 100, { data: 'https://example.com', data_source: '' });
+        canvas.add(qrcodePlaceholder);
+        canvas.setActiveObject(qrcodePlaceholder);
+        canvas.renderAll();
+    });
+
+    // --- INSPECTOR LOGIC ---
+    function updateInspector(obj) {
+        if (!obj) {
+            inspector.classList.add('hidden');
+            return;
+        }
+        inspector.classList.remove('hidden');
+        inspectorContent.innerHTML = ''; // Clear previous content
+
+        const props = [
+            { key: 'left', label: 'X (in)', type: 'number' },
+            { key: 'top', label: 'Y (in)', type: 'number' },
+            { key: 'width', label: 'Width (in)', type: 'number', scale: true },
+            { key: 'height', label: 'Height (in)', type: 'number', scale: true },
+            { key: 'angle', label: 'Angle (°)', type: 'number' },
+        ];
+
+        if (obj.custom_type === 'text') {
+            props.push({ key: 'text', label: 'Text', type: 'text', data_key: 'text' });
+            props.push({ key: 'fontSize', label: 'Font Size', type: 'number' });
+        }
+        if (obj.custom_type === 'image') {
+            props.push({ key: 'src', label: 'Image URL', type: 'text', data_key: 'src' });
+        }
+        if (obj.custom_type === 'barcode' || obj.custom_type === 'qrcode') {
+            props.push({ key: 'data', label: 'Data', type: 'text', data_key: 'data' });
+        }
+        if (obj.custom_type === 'barcode') {
+            props.push({ key: 'barcode_type', label: 'Barcode Type', type: 'select', data_key: 'barcode_type', options: ['code128', 'upca', 'ean13'] });
+        }
+
+        props.push({ key: 'data_source', label: 'Data Source', type: 'text', data_key: 'data_source', placeholder: 'e.g., {{ "{{ item.name }}" }}' });
+
+        props.forEach(prop => {
+            let value;
+            if (prop.data_key) {
+                value = obj.custom_data[prop.data_key] || '';
+            } else if (prop.scale) {
+                value = pixelsToInches(obj.get(prop.key) * obj.get('scale' + (prop.key === 'width' ? 'X' : 'Y'))).toFixed(2);
+            } else {
+                const prop_val = obj.get(prop.key);
+                value = typeof prop_val === 'number' ? prop_val.toFixed(2) : prop_val;
+            }
+            
+            const el = document.createElement('div');
+            let inputHtml;
+            if (prop.type === 'select') {
+                const optionsHtml = prop.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                inputHtml = `<select data-key="${prop.key}" ${prop.data_key ? `data-data_key="${prop.data_key}"` : ''} class="mt-1 w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm">${optionsHtml}</select>`;
+            } else {
+                inputHtml = `<input type="${prop.type}" value="${value}" 
+                                   data-key="${prop.key}" 
+                                   ${prop.data_key ? `data-data_key="${prop.data_key}"` : ''}
+                                   class="mt-1 w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm"
+                                   placeholder="${prop.placeholder || ''}">`;
+            }
+
+            el.innerHTML = `<label class="block text-sm font-medium text-gray-700">${prop.label}</label>${inputHtml}`;
+            inspectorContent.appendChild(el);
+        });
+    }
+
+    inspectorContent.addEventListener('input', (e) => {
+        const activeObj = canvas.getActiveObject();
+        if (!activeObj || !['INPUT', 'SELECT'].includes(e.target.tagName)) return;
+
+        const key = e.target.dataset.key;
+        const data_key = e.target.dataset.data_key;
+        let value = e.target.type === 'number' ? parseFloat(e.target.value) : e.target.value;
+
+        if (data_key) {
+            activeObj.custom_data[data_key] = value;
+            if (key === 'text') activeObj.set('text', value);
+        } else {
+            const isInch = key.includes('in') || ['left', 'top', 'width', 'height'].includes(key);
+            if (isInch) {
+                value = inchesToPixels(value);
+            }
+            if (key === 'width' || key === 'height') {
+                // To resize correctly, we need to adjust scale, not width/height directly
+                if (key === 'width') activeObj.scaleX = value / activeObj.width;
+                if (key === 'height') activeObj.scaleY = value / activeObj.height;
+            } else {
+                activeObj.set(key, value);
+            }
+        }
+        canvas.renderAll();
+    });
+
+    document.getElementById('delete-element').addEventListener('click', () => {
+        const activeObj = canvas.getActiveObject();
+        if (activeObj) {
+            canvas.remove(activeObj);
+            updateInspector(null);
+        }
+    });
+
+    // --- CANVAS EVENTS ---
+    canvas.on({
+        'selection:created': (e) => updateInspector(e.target),
+        'selection:updated': (e) => updateInspector(e.target),
+        'selection:cleared': () => updateInspector(null),
+        'object:modified': (e) => updateInspector(e.target)
+    });
+
+    // --- SAVE/LOAD LOGIC ---
+    function loadCanvas() {
+        try {
+            const elements = JSON.parse(elementsTextarea.value);
+            elements.forEach(el => {
+                let obj;
+                const options = {
+                    left: inchesToPixels(el.x || 0),
+                    top: inchesToPixels(el.y || 0),
+                    angle: el.angle || 0,
+                    custom_type: el.type,
+                    custom_data: {
+                        text: el.text,
+                        src: el.src,
+                        data: el.data,
+                        data_source: el.data_source,
+                        barcode_type: el.barcode_type
+                    }
+                };
+                if (el.type === 'text') {
+                    obj = new fabric.Textbox(el.text || 'Text', { 
+                        ...options, 
+                        width: inchesToPixels(el.width || 1.5),
+                        height: inchesToPixels(el.height || 0.5),
+                        fontSize: el.font_size || 20 
+                    });
+                } else {
+                    const placeholder = createPlaceholder(el.type, inchesToPixels(el.width), inchesToPixels(el.height), options.custom_data);
+                    placeholder.set({
+                        left: options.left,
+                        top: options.top,
+                        angle: options.angle
+                    });
+                    obj = placeholder;
+                }
+                canvas.add(obj);
+            });
+            canvas.renderAll();
+        } catch (e) {
+            console.error("Could not parse label elements JSON:", e);
+        }
+    }
+
+    function saveCanvas() {
+        const elements = canvas.getObjects().map(obj => {
+            const el = {
+                type: obj.custom_type,
+                x: pixelsToInches(obj.left),
+                y: pixelsToInches(obj.top),
+                width: pixelsToInches(obj.width * obj.scaleX),
+                height: pixelsToInches(obj.height * obj.scaleY),
+                angle: obj.angle,
+                ...obj.custom_data
+            };
+            if (obj.custom_type === 'text') {
+                el.font_size = obj.fontSize;
+            }
+            return el;
+        });
+        elementsTextarea.value = JSON.stringify(elements, null, 2);
+    }
+
+    form.addEventListener('submit', saveCanvas);
+
+    // --- INITIALIZATION ---
+    resizeCanvas();
+    loadCanvas();
+
+    widthInput.addEventListener('change', resizeCanvas);
+    heightInput.addEventListener('change', resizeCanvas);
+});
+</script>
+{% endblock %}

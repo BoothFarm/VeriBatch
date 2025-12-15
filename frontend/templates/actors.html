@@ -1,34 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Actors - OriginStack{% endblock %}
+{% block title %}Actors - VeriBatch{% endblock %}
 
 {% block content %}
 <div class="mb-8">
     <div class="flex justify-between items-center">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Actors</h1>
-            <p class="text-gray-600 mt-2">All organizations in your system</p>
+            <p class="text-gray-600 mt-2">Your farms and businesses.</p>
         </div>
         <a href="/actors/new" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-            + New Actor
+            + New Farm/Business
         </a>
     </div>
 </div>
 
 {% if not actors %}
-<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-    <h2 class="text-xl font-semibold mb-2">👋 No Actors Yet</h2>
-    <p class="mb-4">Create your first actor using the API:</p>
-    <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto text-sm">
-curl -X POST http://localhost:8000/api/actors \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "my-farm",
-    "name": "My Farm",
-    "kind": "producer",
-    "contacts": {"email": "farm@example.com"}
-  }'
-    </pre>
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+    <h2 class="text-2xl font-semibold mb-2 text-blue-900">👋 Welcome!</h2>
+    <p class="mb-6 text-blue-800">It looks like you haven't set up your farm or business profile yet. This is the first step to using VeriBatch.</p>
+    <a href="/actors/new" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md">
+        Create Your Business Profile
+    </a>
 </div>
 {% else %}
 

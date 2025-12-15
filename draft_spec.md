@@ -1,8 +1,8 @@
-# OriginStack ERP Specification
+# VeriBatch ERP Specification
 
 ## 1. What This ERP Is
 
-**Working name:** OriginStack *(change later if you want)*
+**Working name:** VeriBatch *(change later if you want)*
 
 A SaaS system for small producers (farms + cottage food) where everything — inventory, production, batch tracking, labels, compliance — is stored and exposed as **Open Origin JSON (OOJ)**.
 

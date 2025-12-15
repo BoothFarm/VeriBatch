@@ -1,6 +1,6 @@
 # Frontend CRUD Operations
 
-The OriginStack frontend now supports full Create, Read, Update, and Delete operations for all entities through a beautiful web interface.
+The VeriBatch frontend now supports full Create, Read, Update, and Delete operations for all entities through a beautiful web interface.
 
 ## Available Operations
 

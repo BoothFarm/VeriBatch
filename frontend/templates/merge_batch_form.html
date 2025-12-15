@@ -1,11 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Merge Batches - OriginStack{% endblock %}
+{% block title %}Merge Batches - VeriBatch{% endblock %}
 
 {% block content %}
 <div class="mb-6">
     <h1 class="text-3xl font-bold text-gray-900">🔗 Merge Batches</h1>
     <p class="text-gray-600 mt-2">Combine multiple batches into one larger batch</p>
+</div>
+
+<!-- Merge vs Assembly Note -->
+<div class="max-w-4xl mb-6">
+    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+        <p class="font-bold">Note:</p>
+        <p>Merge is for consolidating batches of the <em>same item</em> (e.g., combining two half-full jars of vinegar). 
+        To combine different ingredients into a new product, use <a href="/actors/{{ actor_id }}/production-run/new" class="underline font-bold">Production Run</a>.</p>
+    </div>
 </div>
 
 <!-- Helper -->

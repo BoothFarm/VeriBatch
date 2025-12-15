@@ -1,11 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Batch {{ batch.id }} - OriginStack{% endblock %}
+{% block title %}Batch {{ batch.id }} - VeriBatch{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">Batch Details</h1>
-    <p class="text-gray-600 mt-2">{{ batch.id }}</p>
+<div class="mb-8 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900">Batch Details</h1>
+        <p class="text-gray-600 mt-2">{{ batch.id }}</p>
+    </div>
+    <div class="flex gap-3">
+        <a href="/actors/{{ actor_id }}/batches/{{ batch.id }}/recall-report" 
+           class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition flex items-center shadow-sm border border-red-800"
+           title="Generate Compliance Recall Report">
+            🚨 Run Mock Recall
+        </a>
+        <a href="/actors/{{ actor_id }}/batches/{{ batch.id }}/edit" 
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center shadow-sm">
+            ✏️ Edit Batch
+        </a>
+    </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -167,14 +180,54 @@
 </div>
 
 <!-- Actions -->
-<div class="mt-8 flex space-x-4">
-    <a href="/actors/{{ actor_id }}/batches" 
+<div class="mt-8 flex space-x-4 items-center">
+    <a href="/actors/{{ actor_id }}/batches"
        class="text-green-600 hover:underline">
         ← Back to Batches
     </a>
-    <a href="/actors/{{ actor_id }}/traceability/batch/{{ batch.id }}" 
-       class="text-blue-600 hover:underline">
-        View Traceability Graph →
+    <div class="flex gap-2">
+        <a href="/actors/{{ actor_id }}/traceability/batch/{{ batch.id }}"
+           class="text-blue-600 hover:underline">
+            View Traceability Graph →
+        </a>
+        <a href="/api/actors/{{ actor_id }}/export/traceability/{{ batch.id }}"
+           class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-200 hover:bg-blue-100">
+            Export Graph JSON
+        </a>
+    </div>
+</div>
+
+<!-- Label Printing Options -->
+<div class="mt-8 p-6 bg-white rounded-lg shadow-md flex items-center space-x-4">
+    <h2 class="text-xl font-semibold text-gray-900">Print Labels</h2>
+    
+    <!-- Simple Print (HTML) -->
+    <a href="/actors/{{ actor_id }}/batches/{{ batch.id }}/print_label"
+       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+       target="_blank">
+        🖨️ Basic Label (HTML)
     </a>
+
+    <!-- Export JSON -->
+    <a href="/api/actors/{{ actor_id }}/export/batches/{{ batch.id }}"
+       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+        💾 Export JSON
+    </a>
+
+    <!-- Advanced Print (PDF with Template) -->
+    <form id="printPdfForm" method="GET" action="/actors/{{ actor_id }}/batches/{{ batch.id }}/print_label/pdf" target="_blank">
+        <label for="template_id" class="sr-only">Select Label Template</label>
+        <select id="template_id" name="template_id" 
+                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+            <option value="">Default PDF Label</option>
+            {% for template in label_templates %}
+            <option value="{{ template.id }}">{{ template.name }} ({{ template.width_in }}"x{{ template.height_in }}")</option>
+            {% endfor %}
+        </select>
+        <button type="submit" 
+                class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            📄 Print Custom PDF
+        </button>
+    </form>
 </div>
 {% endblock %}

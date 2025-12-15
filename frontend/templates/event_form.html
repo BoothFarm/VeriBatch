@@ -1,43 +1,58 @@
 {% extends "base.html" %}
 
-{% block title %}New Event - OriginStack{% endblock %}
+{% block title %}{% if mode == 'edit' %}Edit Event{% else %}New Event{% endif %} - VeriBatch{% endblock %}
 
 {% block content %}
 <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">Create New Event</h1>
-    <p class="text-gray-600 mt-2">Record a production activity</p>
+    <h1 class="text-3xl font-bold text-gray-900">
+        {% if mode == 'edit' %}Edit Event{% else %}Create New Event{% endif %}
+    </h1>
+    <p class="text-gray-600 mt-2">
+        {% if mode == 'edit' %}Update event metadata{% else %}Record a production activity{% endif %}
+    </p>
 </div>
 
 <div class="max-w-2xl">
-    <form method="POST" action="/actors/{{ actor_id }}/events/create" class="bg-white rounded-lg shadow p-6">
+    <form method="POST" 
+          action="{% if mode == 'edit' %}/actors/{{ actor_id }}/events/{{ event.id }}/update{% else %}/actors/{{ actor_id }}/events/create{% endif %}" 
+          class="bg-white rounded-lg shadow p-6">
         
         <!-- ID -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Event ID *</label>
             <input type="text" name="id" 
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {% if mode == 'edit' %}bg-gray-100 text-gray-500 cursor-not-allowed{% endif %}"
                    placeholder="e.g., evt-2024-001"
+                   value="{{ event.id if event else '' }}"
+                   {% if mode == 'edit' %}readonly{% endif %}
                    required>
         </div>
 
         <!-- Event Type -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Event Type *</label>
-            <select name="event_type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            <select name="event_type" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 {% if mode == 'edit' %}bg-gray-100 text-gray-500{% endif %}" 
+                    {% if mode == 'edit' %}disabled{% endif %}
+                    required>
                 <option value="">Select type...</option>
-                <option value="processing">Processing</option>
-                <option value="split">Split</option>
-                <option value="merge">Merge</option>
-                <option value="disposal">Disposal</option>
-                <option value="transfer">Transfer</option>
+                <option value="planting" {% if (event and event.event_type == 'planting') or (preselected_type == 'planting') %}selected{% endif %}>Planting</option>
+                <option value="harvest" {% if (event and event.event_type == 'harvest') or (preselected_type == 'harvest') %}selected{% endif %}>Harvest</option>
+                <option value="processing" {% if (event and event.event_type == 'processing') or (preselected_type == 'processing') %}selected{% endif %}>Processing</option>
+                <option value="split" {% if event and event.event_type == 'split' %}selected{% endif %}>Split</option>
+                <option value="merge" {% if event and event.event_type == 'merge' %}selected{% endif %}>Merge</option>
+                <option value="disposal" {% if event and event.event_type == 'disposal' %}selected{% endif %}>Disposal</option>
+                <option value="transfer" {% if event and event.event_type == 'transfer' %}selected{% endif %}>Transfer</option>
             </select>
         </div>
 
         <!-- Timestamp -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Timestamp</label>
+            <!-- Note: Value format must be YYYY-MM-DDTHH:MM for datetime-local -->
             <input type="datetime-local" name="timestamp" 
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                   value="{{ event.timestamp[:16] if event and event.timestamp else '' }}">
             <p class="text-xs text-gray-500 mt-1">Leave blank for current time</p>
         </div>
 
@@ -46,7 +61,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Performed By</label>
             <input type="text" name="performed_by" 
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                   placeholder="Person or team name">
+                   placeholder="Person or team name"
+                   value="{{ event.performed_by if event and event.performed_by else '' }}">
         </div>
 
         <!-- Process -->
@@ -55,7 +71,7 @@
             <select name="process_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 <option value="">None</option>
                 {% for process in processes %}
-                <option value="{{ process.id }}">{{ process.name }}</option>
+                <option value="{{ process.id }}" {% if event and event.process_id == process.id %}selected{% endif %}>{{ process.name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -66,21 +82,25 @@
             <select name="location_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 <option value="">None</option>
                 {% for location in locations %}
-                <option value="{{ location.id }}">{{ location.name }}</option>
+                <option value="{{ location.id }}" {% if event and event.location_id == location.id %}selected{% endif %}>{{ location.name }}</option>
                 {% endfor %}
             </select>
         </div>
 
-        <!-- Inputs -->
+        {% if mode != 'edit' %}
+        <!-- Inputs (Create Only) -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Input Batches</label>
-            <input type="text" name="inputs" 
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                   placeholder="batch-1, batch-2, batch-3">
-            <p class="text-xs text-gray-500 mt-1">Comma-separated batch IDs that were consumed</p>
+            <select name="inputs" multiple 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 h-32">
+                {% for batch in batches %}
+                <option value="{{ batch.id }}">{{ batch.id }} - {{ batch.item_id }} ({{ batch.production_date }})</option>
+                {% endfor %}
+            </select>
+            <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple input batches (e.g. seeds for planting)</p>
         </div>
 
-        <!-- Outputs -->
+        <!-- Outputs (Create Only) -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Output Batches</label>
             <input type="text" name="outputs" 
@@ -88,19 +108,43 @@
                    placeholder="batch-10, batch-11">
             <p class="text-xs text-gray-500 mt-1">Comma-separated batch IDs that were created</p>
         </div>
+        {% else %}
+        <!-- View Only Inputs/Outputs for Edit -->
+        {% if event.inputs %}
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Input Batches (Read Only)</label>
+            <div class="p-3 bg-gray-50 rounded border border-gray-200 text-sm">
+                {% for input in event.inputs %}
+                <span class="inline-block bg-white border border-gray-300 rounded px-2 py-1 mr-2 mb-1">{{ input.batch_id }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if event.outputs %}
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Output Batches (Read Only)</label>
+            <div class="p-3 bg-gray-50 rounded border border-gray-200 text-sm">
+                {% for output in event.outputs %}
+                <span class="inline-block bg-white border border-gray-300 rounded px-2 py-1 mr-2 mb-1">{{ output.batch_id }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
 
         <!-- Notes -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
             <textarea name="notes" rows="3" 
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Any observations, issues, or details..."></textarea>
+                      placeholder="Any observations, issues, or details...">{{ event.notes if event and event.notes else '' }}</textarea>
         </div>
 
         <!-- Actions -->
         <div class="flex gap-3">
             <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                Create Event
+                {% if mode == 'edit' %}Save Changes{% else %}Create Event{% endif %}
             </button>
             <a href="/actors/{{ actor_id }}/events" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
                 Cancel
@@ -109,7 +153,7 @@
     </form>
 </div>
 
-{% if not batches %}
+{% if mode != 'edit' and not batches %}
 <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
     <p class="text-yellow-800 text-sm">
         ⚠️ No active batches found. <a href="/actors/{{ actor_id }}/batches/new" class="underline font-medium">Create batches first</a> before recording events.

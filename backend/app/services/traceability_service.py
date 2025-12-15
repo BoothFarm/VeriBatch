@@ -39,6 +39,22 @@ def get_batch_traceability(
         db_models.Event.actor_id == actor_id
     ).all()
     
+    if direction == "none":
+        # Find all events where this batch is an input or an output
+        all_related_events = []
+        for event in events:
+            event_doc = event.jsonb_doc
+            inputs = event_doc.get("inputs", [])
+            outputs = event_doc.get("outputs", [])
+            
+            is_input = any(inp.get("batch_id") == batch_id for inp in inputs)
+            is_output = any(out.get("batch_id") == batch_id for out in outputs)
+            
+            if is_input or is_output:
+                all_related_events.append(event)
+        
+        result["events"].extend([e.jsonb_doc for e in all_related_events])
+
     if direction in ["upstream", "both"]:
         # Find events where this batch is an output
         upstream_events = []

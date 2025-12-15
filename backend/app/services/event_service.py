@@ -24,6 +24,7 @@ def record_processing_event(
     outputs: List[Dict[str, Any]],
     location_id: Optional[str] = None,
     packaging_materials: Optional[List[Dict[str, Any]]] = None,
+    waste: Optional[Dict[str, Any]] = None,
     performed_by: Optional[str] = None,
     notes: Optional[str] = None,
     timestamp: Optional[str] = None
@@ -62,9 +63,40 @@ def record_processing_event(
     if notes:
         event_data["notes"] = notes
     
+    # Add waste
+    if waste:
+        event_data["waste"] = waste
+    
     # Add inputs
     if inputs:
         event_data["inputs"] = inputs
+        # Deduct used quantities from input batches
+        for input_data in inputs:
+            batch_id = input_data.get("batch_id")
+            used_qty = input_data.get("amount") # {amount: X, unit: Y}
+            
+            if batch_id and used_qty:
+                batch = batch_service.get_batch(db, actor_id, batch_id)
+                if batch:
+                    current_qty = batch.jsonb_doc.get("quantity")
+                    if current_qty:
+                        current_unit = current_qty.get("unit")
+                        used_unit = used_qty.get("unit", current_unit) # Default to batch unit
+                        
+                        if current_unit == used_unit:
+                            new_amount = max(0, current_qty.get("amount", 0) - used_qty.get("amount", 0))
+                            
+                            # Update Quantity
+                            batch_service.update_batch_details(db, actor_id, batch_id, {
+                                "quantity": {
+                                    "amount": new_amount,
+                                    "unit": current_unit
+                                }
+                            })
+                            
+                            # Update Status if depleted
+                            if new_amount <= 0:
+                                batch_service.update_batch_status(db, actor_id, batch_id, "depleted")
         
     # Add outputs
     if outputs:
@@ -321,63 +353,49 @@ def merge_batches(
     return db_event
 
 
-def dispose_batch(
-    db: Session,
-    event_id: str,
-    actor_id: str,
-    batch_id: str,
-    reason: str,
-    location_id: Optional[str] = None,
-    notes: Optional[str] = None,
-    timestamp: Optional[str] = None
-) -> db_models.Event:
-    """
-    Dispose of a batch (waste, expired, damaged, etc.)
-    Creates disposal event and updates batch status
-    """
-    now = datetime.utcnow().isoformat() + "Z"
-    if not timestamp:
-        timestamp = now
-    
-    # Get batch
-    batch = batch_service.get_batch(db, actor_id, batch_id)
-    if not batch:
-        raise ValueError(f"Batch {batch_id} not found")
-    
-    # Build disposal event
-    event_data = {
-        "schema": entities.SCHEMA_VERSION,
-        "type": "event",
-        "id": event_id,
-        "actor_id": actor_id,
-        "timestamp": timestamp,
-        "event_type": "disposal",
-        "inputs": [{
-            "batch_id": batch_id,
-            "amount": batch.jsonb_doc.get("quantity")
-        }],
-        "notes": f"Reason: {reason}" + (f". {notes}" if notes else ""),
-        "created_at": now,
-        "updated_at": now
-    }
-    
-    if location_id:
-        event_data["location_id"] = location_id
-    
-    # Update batch status
-    batch_service.update_batch_status(db, actor_id, batch_id, "disposed")
-    
-    # Create event
-    db_event = db_models.Event(
-        id=event_id,
-        actor_id=actor_id,
-        event_type="disposal",
-        timestamp=timestamp,
-        jsonb_doc=event_data
-    )
-    
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
     
     return db_event
+
+
+def get_event(db: Session, actor_id: str, event_id: str) -> Optional[db_models.Event]:
+    """Get a specific event"""
+    return db.query(db_models.Event).filter(
+        db_models.Event.actor_id == actor_id,
+        db_models.Event.id == event_id
+    ).first()
+
+
+def update_event(
+    db: Session,
+    actor_id: str,
+    event_id: str,
+    data: dict
+) -> Optional[db_models.Event]:
+    """Update event metadata (notes, timestamp, etc.)"""
+    event = get_event(db, actor_id, event_id)
+    if not event:
+        return None
+        
+    # Update fields
+    if "timestamp" in data:
+        event.timestamp = data["timestamp"]
+        
+    # Update JSON doc
+    doc = event.jsonb_doc.copy()
+    
+    for key, value in data.items():
+        if value is None:
+            doc.pop(key, None)
+        else:
+            doc[key] = value
+        
+    doc["updated_at"] = datetime.utcnow().isoformat() + "Z"
+    event.jsonb_doc = doc
+    
+    db.commit()
+    db.refresh(event)
+    
+    return event

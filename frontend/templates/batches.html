@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Lot Tracking - OriginStack{% endblock %}
+{% block title %}Lot Tracking - VeriBatch{% endblock %}
 
 {% block content %}
 <!-- Header -->
 <div class="mb-6">
     <div class="flex justify-between items-start">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Lot & Batch Tracking</h1>
-            <p class="text-gray-600 mt-1">Track every batch from production to sale</p>
+            <h1 class="text-3xl font-bold text-gray-900">Lot Codes & Inventory</h1>
+            <p class="text-gray-600 mt-1">Your complete record of everything you grow and make.</p>
         </div>
         <div class="flex gap-3">
             <a href="/actors/{{ actor_id }}/batches/new" 
@@ -42,13 +42,13 @@
 <div class="text-center py-12">
     <div class="text-6xl mb-4">📦</div>
     <h2 class="text-2xl font-semibold text-gray-900 mb-2">
-        {% if filter_status %}No {{ filter_status }} batches found{% else %}No batches yet{% endif %}
+        {% if filter_status %}No {{ filter_status }} batches found{% else %}No batches recorded yet{% endif %}
     </h2>
     <p class="text-gray-600 mb-6 max-w-md mx-auto">
         {% if filter_status %}
             Try a different filter or view all batches.
         {% else %}
-            Start by creating your first batch with a lot code. This is how you'll track everything from production to sale.
+            Harvested some carrots? Baked some bread? Give it a lot code here so you can track it.
         {% endif %}
     </p>
     
@@ -61,11 +61,11 @@
     <div class="flex flex-col sm:flex-row gap-3 justify-center">
         <a href="/actors/{{ actor_id }}/batches/new" 
            class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition">
-            Create First Batch
+            Log a Batch
         </a>
         <a href="/actors/{{ actor_id }}/items" 
            class="text-green-600 border border-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition">
-            Manage Products First
+            Add Products First
         </a>
     </div>
     {% endif %}
@@ -99,7 +99,14 @@
 <!-- Batch Cards (Better for producers than tables) -->
 <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
     {% for batch in batches %}
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition">
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition relative group">
+        <!-- Export Button -->
+        <a href="/api/actors/{{ actor_id }}/export/batches/{{ batch.id }}" 
+           class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition z-10" 
+           title="Export JSON" onclick="event.stopPropagation()">
+            💾
+        </a>
+
         <!-- Card Header -->
         <div class="p-6 pb-4">
             <div class="flex justify-between items-start mb-3">
@@ -169,11 +176,31 @@
     {% endfor %}
 </div>
 
+{% if total_pages > 1 %}
+<div class="flex justify-center mt-8 space-x-2">
+    {% if page > 1 %}
+    <a href="?page={{ page - 1 }}{% if filter_status %}&status={{ filter_status }}{% endif %}" 
+       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 bg-white">
+       ← Previous
+    </a>
+    {% endif %}
+    
+    <span class="px-4 py-2 text-gray-600 font-medium self-center">Page {{ page }} of {{ total_pages }}</span>
+    
+    {% if page < total_pages %}
+    <a href="?page={{ page + 1 }}{% if filter_status %}&status={{ filter_status }}{% endif %}" 
+       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 bg-white">
+       Next →
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
 <!-- Summary Footer -->
 <div class="mt-8 bg-gray-50 rounded-lg p-4 flex justify-between items-center">
     <div class="text-gray-600">
-        <span class="font-medium">{{ batches|length }}</span> 
-        batch{{ 'es' if batches|length != 1 else '' }}
+        <span class="font-medium">{{ total_items }}</span> 
+        batch{{ 'es' if total_items != 1 else '' }}
         {% if filter_status %}with status "{{ filter_status }}"{% else %}total{% endif %}
     </div>
     
@@ -201,7 +228,7 @@
     {% if batches %}
     <div class="text-sm text-gray-500">
         Need help? <a href="/docs" class="text-green-600 hover:underline">View API docs</a> 
-        or <a href="/actors/{{ actor_id }}/export/ooj-archive" class="text-green-600 hover:underline">export all data</a>
+        or <a href="/api/actors/{{ actor_id }}/export/ooj-archive" class="text-green-600 hover:underline">export all data</a>
     </div>
     {% endif %}
 </div>

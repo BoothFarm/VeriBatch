@@ -1,6 +1,6 @@
-# OriginStack Backend
+# VeriBatch Backend
 
-FastAPI backend for OriginStack - an Open Origin JSON (OOJ) compliant ERP system for small producers.
+FastAPI backend for VeriBatch - an Open Origin JSON (OOJ) compliant ERP system for small producers.
 
 ## Quick Start
 

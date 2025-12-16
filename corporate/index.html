@@ -1,109 +1,345 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booth Farm Enterprises Ltd.</title>
+    <title>Booth Farm Enterprises Ltd. | Agri-Tech & Sustainable Farming</title>
+    <meta name="description" content="Bridging the gap between regenerative agriculture and modern software solutions. Home of VeriBatch.">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
-        .font-serif { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; }
-        .text-green-800 { color: #166534; }
-        .bg-green-700 { background-color: #047857; }
-        .bg-amber-50 { background-color: #fffbeb; }
-        .hover\:bg-green-600:hover { background-color: #059669; }
-        .hover\:bg-green-900:hover { background-color: #064e3b; }
-        .hover\:bg-white:hover { background-color: #ffffff; }
-    </style>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f291e',  /* Very dark green/black */
+                            green: '#1a4131', /* Primary Corporate Green */
+                            leaf: '#4ade80',  /* Tech/Growth Green Accent */
+                            slate: '#f8fafc', /* Light background */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-amber-50/50 min-h-screen flex flex-col">
-    <nav class="bg-green-700 text-white shadow-lg">
-        <div class="max-w-screen-xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div class="flex justify-between h-16">
+<body class="bg-brand-slate text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold flex items-center font-serif tracking-wide">
-                        <span class="text-3xl mr-2">🚜</span>
-                        Booth Farm Enterprises
+                    <a href="#" class="flex items-center gap-3 group">
+                        <div class="w-10 h-10 bg-brand-green text-white flex items-center justify-center rounded-lg shadow-sm group-hover:bg-brand-dark transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-serif font-bold text-gray-900 text-lg leading-tight">Booth Farm</span>
+                            <span class="text-xs uppercase tracking-widest text-gray-500 font-semibold">Enterprises Ltd.</span>
+                        </div>
                     </a>
-                    <div class="ml-10 hidden md:flex space-x-6">
-                        <a href="/" class="px-3 py-2 rounded-md hover:bg-green-600 transition">Home</a>
-                        <a href="#about" class="px-3 py-2 rounded-md hover:bg-green-600 transition">Our Story</a>
-                        <a href="https://your-veribatch-app-url.com" target="_blank" class="px-3 py-2 rounded-md hover:bg-green-600 transition">VeriBatch App</a>
-                        <a href="#contact" class="px-3 py-2 rounded-md hover:bg-green-600 transition">Contact</a>
-                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#mission" class="text-sm font-medium text-gray-600 hover:text-brand-green transition-colors">Our Mission</a>
+                    <a href="#veribatch" class="text-sm font-medium text-gray-600 hover:text-brand-green transition-colors">Solutions</a>
+                    <a href="#pricing" class="text-sm font-medium text-gray-600 hover:text-brand-green transition-colors">Pricing</a>
+                    <a href="#contact" class="text-sm font-medium text-gray-600 hover:text-brand-green transition-colors">Contact</a>
+                    
+                    <a href="https://veribatch.ca" class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-brand-green hover:bg-brand-dark transition-all shadow-sm">
+                        Go to VeriBatch
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
     <main class="flex-grow">
-        <!-- Hero Section -->
-        <section class="bg-gradient-to-r from-green-700 to-green-600 text-white py-20 px-4 sm:px-6 lg:px-8 text-center shadow-inner">
-            <div class="max-w-4xl mx-auto">
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold font-serif leading-tight">
-                    Innovating the Future of Farm Traceability
-                </h1>
-                <p class="mt-6 text-xl sm:text-2xl opacity-90">
-                    Empowering agricultural producers with cutting-edge technology for transparency and efficiency.
-                </p>
-                <a href="#veribatch" class="mt-10 inline-block bg-amber-300 text-green-900 font-bold py-3 px-8 rounded-full text-lg hover:bg-amber-200 transition transform hover:scale-105 shadow-lg">
-                    Discover Our Solutions
-                </a>
+        
+        <section class="relative bg-brand-dark overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
+                </svg>
             </div>
-        </section>
-
-        <!-- About Us Section -->
-        <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-            <div class="max-w-screen-xl mx-auto text-center">
-                <h2 class="text-3xl sm:text-4xl font-bold text-green-800 font-serif">Our Story</h2>
-                <p class="mt-6 text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                    Booth Farm Enterprises Ltd. is dedicated to revolutionizing the agricultural sector through technology. With a deep understanding of farming challenges, we build intuitive and powerful tools that enhance operational efficiency, ensure product integrity, and foster greater trust between producers and consumers. Our commitment is to sustainable practices and innovative solutions that grow with you.
-                </p>
-            </div>
-        </section>
-
-        <!-- VeriBatch Product Section -->
-        <section id="veribatch" class="py-16 px-4 sm:px-6 lg:px-8 bg-amber-50">
-            <div class="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-                <div class="text-center md:text-left">
-                    <h2 class="text-4xl font-bold text-green-800 font-serif">Introducing VeriBatch</h2>
-                    <p class="mt-6 text-xl text-gray-700 leading-relaxed">
-                        VeriBatch is our flagship product, designed to bring unparalleled traceability and management to your farm's produce. From the field to the market, VeriBatch provides a clear, verifiable chain of custody, helping you manage batches, track events, and ensure compliance with ease.
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+                <div class="max-w-3xl">
+                    <h1 class="text-4xl lg:text-6xl font-serif font-bold text-white tracking-tight mb-6">
+                        Cultivating Data.<br>
+                        <span class="text-brand-leaf">Harvesting Insight.</span>
+                    </h1>
+                    <p class="text-xl text-gray-300 mb-10 leading-relaxed font-light">
+                        Pass every food safety inspection with digital traceability. We build the tools that empower small producers to track every batch from farm to shelf.
                     </p>
-                    <a href="https://your-veribatch-app-url.com" target="_blank" class="mt-8 inline-block bg-green-800 text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-green-700 transition transform hover:scale-105 shadow-lg">
-                        Launch VeriBatch App
-                    </a>
-                </div>
-                <div class="relative w-full h-64 md:h-96 bg-gray-200 rounded-lg shadow-xl overflow-hidden flex items-center justify-center">
-                    <!-- Placeholder for an image or animated GIF of VeriBatch in action -->
-                    <p class="text-gray-500 text-xl">VeriBatch App Screenshot/Demo Placeholder</p>
-                    <!-- <img src="/path/to/veribatch-screenshot.jpg" alt="VeriBatch Application Interface" class="w-full h-full object-cover"> -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="https://veribatch.ca" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-brand-dark bg-brand-leaf hover:bg-white transition-all shadow-lg hover:shadow-xl">
+                            Launch VeriBatch Platform
+                        </a>
+                        <a href="#mission" class="inline-flex items-center justify-center px-8 py-3 border border-gray-500 text-base font-medium rounded-md text-white hover:bg-white/10 transition-all">
+                            Learn About Us
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-            <div class="max-w-screen-xl mx-auto text-center">
-                <h2 class="text-3xl sm:text-4xl font-bold text-green-800 font-serif">Get in Touch</h2>
-                <p class="mt-6 text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                    Have questions or want to learn more about how Booth Farm Enterprises can help your operation? We'd love to hear from you.
-                </p>
-                <div class="mt-8">
-                    <p class="text-xl text-green-800 font-semibold">Email: <a href="mailto:info@boothfarmenterprises.com" class="text-green-600 hover:underline">info@boothfarmenterprises.com</a></p>
-                    <p class="mt-2 text-xl text-green-800 font-semibold">Phone: <a href="tel:+15551234567" class="text-green-600 hover:underline">+1 (555) 123-4567</a></p>
-                    <p class="mt-2 text-md text-gray-600">Booth Farm Enterprises Ltd.<br>123 Farmstead Lane, Agri-City, AG 00000</p>
+        <section id="mission" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="text-3xl font-serif font-bold text-gray-900 mb-6">Rooted in Soil, Written in Code.</h2>
+                        <div class="h-1 w-20 bg-brand-leaf mb-8"></div>
+                        <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                            Modern agriculture faces a dual challenge: maintaining the integrity of the land while meeting the complex demands of supply chain compliance. 
+                        </p>
+                        <p class="text-lg text-gray-600 leading-relaxed">
+                            At Booth Farm Enterprises, we are producers first. Our software solutions aren't built in a distant boardroom—they are forged in the field, tested against real-world constraints, and refined for operational efficiency.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 h-full">
+                            <div class="text-brand-green mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-bold text-gray-900 mb-2">Agri-Tech Development</h3>
+                            <p class="text-sm text-gray-500">Custom ERP and traceability solutions designed for small-to-mid sized operations.</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 h-full">
+                            <div class="text-brand-green mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="font-bold text-gray-900 mb-2">Quality Assurance</h3>
+                            <p class="text-sm text-gray-500">Ensuring product integrity from seed to shelf through rigorous tracking.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
+
+        <section id="veribatch" class="py-24 bg-brand-slate border-y border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-brand-green font-semibold tracking-wider uppercase text-sm">Our Flagship Platform</span>
+                    <h2 class="mt-3 text-3xl font-serif font-bold text-gray-900 sm:text-4xl">Introducing VeriBatch</h2>
+                    <p class="mt-4 text-lg text-gray-600">
+                        Designed for small producers, herbalists, and processors. Start simple with basic lot tracking, then grow into full supply chain traceability.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 mb-16">
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6 text-brand-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Pass Every Inspection</h3>
+                        <p class="text-gray-600">Never worry about compliance again. Generate complete digital records ready for FDA, Organic, and HACCP auditors instantly.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6 text-brand-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Handle Recalls Fast</h3>
+                        <p class="text-gray-600">Time is critical. With our advanced traceability graph, you can identify all affected products and batches in under 30 seconds.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6 text-brand-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Own Your Data</h3>
+                        <p class="text-gray-600">Built on the <strong>Open Origin JSON</strong> standard. Export your entire history anytime. No vendor lock-in, just pure data sovereignty.</p>
+                    </div>
+                </div>
+
+                <div class="bg-brand-dark rounded-2xl p-8 md:p-12 text-white overflow-hidden relative">
+                    <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-brand-green opacity-50 blur-3xl"></div>
+                    
+                    <div class="relative z-10 grid md:grid-cols-2 gap-12">
+                        <div>
+                            <h3 class="text-2xl font-serif font-bold mb-6">Comprehensive Capabilities</h3>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <svg class="h-6 w-6 text-brand-leaf mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-gray-300"><strong>Batch Tracking:</strong> Manage lot codes and basic inventory with ease.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-6 w-6 text-brand-leaf mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-gray-300"><strong>Process Logging:</strong> Track inputs, outputs, splits, merges, and disposal.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-6 w-6 text-brand-leaf mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-gray-300"><strong>Full Provenance:</strong> Upstream and downstream traceability graphs.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="h-6 w-6 text-brand-leaf mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-gray-300"><strong>Location Aware:</strong> Geographic tracking with coordinate support.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="flex flex-col justify-center items-start border-l border-brand-green pl-8 md:pl-12">
+                            <p class="text-xl font-light text-gray-200 italic mb-8">
+                                "Start simple, grow advanced. From single-farm operations to complex processing networks."
+                            </p>
+                            <a href="https://veribatch.ca" class="inline-flex items-center justify-center px-8 py-3 bg-white text-brand-dark font-bold rounded-lg hover:bg-brand-leaf transition-colors">
+                                Get Started
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="pricing" class="py-24 bg-white border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-brand-green font-semibold tracking-wider uppercase text-sm">Flexible Plans</span>
+                    <h2 class="mt-3 text-3xl font-serif font-bold text-gray-900 sm:text-4xl">Simple, Transparent Pricing</h2>
+                    <p class="mt-4 text-lg text-gray-600">
+                        Choose the plan that fits your growing season. No hidden fees.
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 items-start">
+                    <!-- Monthly Plan -->
+                    <div class="bg-white p-8 rounded-2xl border border-gray-200 hover:border-gray-300 transition-colors relative">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Monthly</h3>
+                        <p class="text-sm text-gray-500 mb-6">Pay as you grow. Cancel anytime.</p>
+                        <div class="flex items-baseline mb-6">
+                            <span class="text-4xl font-extrabold text-gray-900">$29</span>
+                            <span class="ml-2 text-gray-500">/ month</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-8">Total: $348 / year</p>
+                        <ul class="space-y-4 mb-8 text-sm text-gray-600">
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-brand-green mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                Full Traceability Suite
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-brand-green mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                Unlimited Batches
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-brand-green mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                Priority Support
+                            </li>
+                        </ul>
+                        <a href="https://veribatch.ca/signup?plan=monthly" class="block w-full py-3 px-4 bg-gray-50 text-brand-green font-bold text-center rounded-lg hover:bg-gray-100 border border-gray-200 transition-colors">Start Monthly</a>
+                    </div>
+
+                    <!-- Annual Plan -->
+                    <div class="bg-white p-8 rounded-2xl border-2 border-brand-green shadow-xl relative transform scale-105 z-10">
+                        <div class="absolute top-0 right-0 -mt-4 mr-4 bg-brand-leaf text-brand-dark text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                            Best Value
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Annual</h3>
+                        <p class="text-sm text-gray-500 mb-6">Commit to compliance year-round.</p>
+                        <div class="flex items-baseline mb-2">
+                            <span class="text-4xl font-extrabold text-gray-900">$290</span>
+                            <span class="ml-2 text-gray-500">/ year</span>
+                        </div>
+                        <p class="text-sm text-brand-green font-semibold mb-8">Equivalent to $24/mo (2 Months Free)</p>
+                        <ul class="space-y-4 mb-8 text-sm text-gray-600">
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-brand-green mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <strong>Everything in Monthly</strong>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-brand-green mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                2 Months Free
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-brand-green mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                Advanced Export Tools
+                            </li>
+                        </ul>
+                        <a href="https://veribatch.ca/signup?plan=annual" class="block w-full py-3 px-4 bg-brand-green text-white font-bold text-center rounded-lg hover:bg-brand-dark transition-colors shadow-lg">Start Annual Plan</a>
+                    </div>
+
+                    <!-- Dormant Plan -->
+                    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-200 hover:border-gray-300 transition-colors relative">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Seasonal / Dormant</h3>
+                        <p class="text-sm text-gray-500 mb-6">Keep records active in off-season.</p>
+                        <div class="flex items-baseline mb-6">
+                            <span class="text-4xl font-extrabold text-gray-900">$5</span>
+                            <span class="ml-2 text-gray-500">/ month</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-8">Billed monthly during inactivity</p>
+                        <ul class="space-y-4 mb-8 text-sm text-gray-600">
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                Read-Only Access
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-brand-green mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <strong>Indefinite Data Retention</strong>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <span class="text-gray-500 italic">Prevents 90-day auto-deletion</span>
+                            </li>
+                        </ul>
+                        <a href="https://veribatch.ca/login" class="block w-full py-3 px-4 bg-white text-gray-600 font-bold text-center rounded-lg hover:text-gray-900 border border-gray-300 transition-colors">Switch in Settings</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact" class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <h4 class="text-white text-xl font-serif font-bold">Booth Farm Enterprises Ltd.</h4>
+                        <p class="mt-2 text-sm text-gray-400">Innovating the future of farm traceability.</p>
+                    </div>
+                    <div class="flex space-x-6 text-sm">
+                        <a href="mailto:colton@boothfarmenterprises.ca" class="hover:text-brand-leaf transition-colors">Contact Support</a>
+                        <span class="text-gray-700">|</span>
+                        <a href="https://veribatch.ca" class="hover:text-brand-leaf transition-colors">VeriBatch Login</a>
+                    </div>
+                </div>
+                <div class="mt-8 border-t border-gray-800 pt-8 text-center text-xs text-gray-500">
+                    &copy; <script>document.write(new Date().getFullYear())</script> Booth Farm Enterprises Ltd. All rights reserved.
+                </div>
+            </div>
+        </footer>
+
     </main>
-
-    <footer class="bg-green-800 text-white border-t border-gray-700 mt-12 py-6">
-        <div class="max-w-screen-xl mx-auto px-4 text-center text-sm">
-            <p class="font-medium text-lg text-white font-serif">Booth Farm Enterprises Ltd.</p>
-            <p class="mt-2 text-xs opacity-80">&copy; 2025 Booth Farm Enterprises Ltd. All rights reserved.</p>
-            <p class="mt-1 text-xs opacity-80">Proud makers of VeriBatch.</p>
-        </div>
-    </footer>
 </body>
 </html>

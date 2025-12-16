@@ -1,6 +1,8 @@
 """
 Open Origin JSON (OOJ) Python Client
-Version 0.3
+Copyright (c) 2025 Booth Farm Enterprises Ltd.
+
+Licensed under the MIT License.
 
 A Python library for working with Open Origin JSON data structures.
 """

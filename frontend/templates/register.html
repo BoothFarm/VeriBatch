@@ -1,50 +1,146 @@
 {% extends "base.html" %}
 
-{% block title %}Register - VeriBatch{% endblock %}
+{% block title %}Start Your Trial - VeriBatch{% endblock %}
 
 {% block content %}
-<div class="min-h-[60vh] flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Create Account</h1>
-            <p class="text-gray-600 mt-2">Join the VeriBatch community</p>
+<div class="min-h-[80vh] flex items-center justify-center py-12">
+    <div class="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-0 shadow-2xl rounded-2xl overflow-hidden">
+        
+        <div class="bg-white p-8 md:p-12 flex flex-col justify-center">
+            <div class="mb-8">
+                <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wide">30-Day Free Trial</span>
+                <h1 class="text-3xl font-bold text-gray-900 mt-3">Create your Farm Profile</h1>
+                <p class="text-gray-600 mt-2">No credit card required. Cancel and export your data anytime.</p>
+            </div>
+
+            {% if error %}
+            <div class="bg-red-50 text-red-700 p-4 rounded-lg mb-6 text-sm border-l-4 border-red-500">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/register" class="space-y-5">
+                <div>
+                    <label for="org_name" class="block text-sm font-medium text-gray-700 mb-1">Farm / Business Name</label>
+                    <input type="text" name="org_name" id="org_name" required placeholder="e.g. Booth Family Farm"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white transition">
+                </div>
+
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                    <input type="text" name="full_name" id="full_name" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white transition">
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" name="email" id="email" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white transition">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" name="password" id="password" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white transition">
+                    <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="terms" name="terms" type="checkbox" required class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded" {% if request.query_params.get("terms_agreed") == "true" %}checked{% endif %}>
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="terms" class="font-medium text-gray-700">I agree to the <a href="/terms" class="text-green-600 hover:underline">Terms of Service</a></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-green-700 text-white py-3 rounded-lg font-bold hover:bg-green-800 transition shadow-lg shadow-green-100 transform hover:-translate-y-0.5">
+                    Start My Trial →
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm text-gray-600">
+                Already have an account? 
+                <a href="/login" class="text-green-700 font-semibold hover:underline">Sign in</a>
+            </div>
         </div>
 
-        {% if error %}
-        <div class="bg-red-50 text-red-700 p-3 rounded-md mb-6 text-sm">
-            {{ error }}
-        </div>
-        {% endif %}
-
-        <form method="POST" action="/register" class="space-y-6">
+        <div class="bg-gray-50 p-8 md:p-12 border-l border-gray-200 flex flex-col justify-between">
+            
             <div>
-                <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" name="full_name" id="full_name" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif">Why use VeriBatch?</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <svg class="h-6 w-6 text-green-600 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-gray-600 text-sm"><strong>Automatic Backups:</strong> We keep your data safe so you don't have to worry about hard drive failures.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="h-6 w-6 text-green-600 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span class="text-gray-600 text-sm"><strong>Bank-Level Security:</strong> Managed SSL encryption and security updates applied automatically.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="h-6 w-6 text-green-600 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span class="text-gray-600 text-sm"><strong>Zero Maintenance:</strong> Focus on farming, not managing Linux servers and Docker containers.</span>
+                    </li>
+                </ul>
             </div>
 
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                <input type="email" name="email" id="email" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+            <div class="mt-12 pt-8 border-t border-gray-200">
+                <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-2">Technical / Developer?</h4>
+                <p class="text-sm text-gray-600 mb-4">
+                    Prefer to manage your own infrastructure? VeriBatch is open source.
+                </p>
+                <a href="https://git.boothfarmenterprises.ca/coltonbooth/VeriBatch" target="_blank" class="flex items-center text-sm font-medium text-gray-500 hover:text-green-700 transition group">
+                    <svg class="w-5 h-5 mr-2 text-gray-400 group-hover:text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                    </svg>
+                    Download Self-Hosted Version
+                </a>
             </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" name="password" id="password" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
-                <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
-            </div>
-
-            <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-md">
-                Create Account
-            </button>
-        </form>
-
-        <div class="mt-6 text-center text-sm text-gray-600">
-            Already have an account? 
-            <a href="/login" class="text-green-600 font-medium hover:underline">Sign in</a>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fields to persist
+        const fields = ['org_name', 'full_name', 'email'];
+        
+        // Restore values from sessionStorage
+        fields.forEach(id => {
+            const storedValue = sessionStorage.getItem('register_' + id);
+            if (storedValue) {
+                const element = document.getElementById(id);
+                if (element) element.value = storedValue;
+            }
+        });
+
+        // Save values to sessionStorage on input
+        fields.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', function(e) {
+                    sessionStorage.setItem('register_' + id, e.target.value);
+                });
+            }
+        });
+
+        // Clear storage on form submit to clean up
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                fields.forEach(id => {
+                    sessionStorage.removeItem('register_' + id);
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}

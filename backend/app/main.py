@@ -4,11 +4,15 @@ FastAPI main application
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import actors, items, batches, events, processes, locations, operations, traceability, export, frontend, auth, compliance
+from app.api import actors, items, batches, events, processes, locations, operations, traceability, export, frontend, auth, compliance, search
 from app.db.database import engine, Base
+from app.services import search_service
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
+
+# Initialize Search Index
+search_service.setup_index()
 
 app = FastAPI(
     title="VeriBatch",
@@ -36,6 +40,7 @@ app.include_router(traceability.router, prefix="/api")
 app.include_router(locations.router, prefix="/api")
 app.include_router(export.router, prefix="/api")
 app.include_router(compliance.router, prefix="/api")
+app.include_router(search.router, prefix="/api")
 
 # Auth routes (no prefix as they are specific endpoints like /login, /register)
 app.include_router(auth.router)

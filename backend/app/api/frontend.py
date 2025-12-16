@@ -58,6 +58,12 @@ def home(request: Request, user: Optional[db_models.User] = Depends(get_current_
     return templates.TemplateResponse("index.html", {"request": request, "user": user})
 
 
+@router.get("/terms", response_class=HTMLResponse)
+def terms(request: Request, user: Optional[db_models.User] = Depends(get_current_user_from_cookie)):
+    """Terms of Service Page"""
+    return templates.TemplateResponse("terms.html", {"request": request, "user": user})
+
+
 @router.get("/dashboard", response_class=HTMLResponse)
 def dashboard(
     request: Request, 

@@ -45,6 +45,17 @@
         </div>
         
         <div class="flex items-center gap-6">
+            <!-- System Status Widget -->
+            <div class="hidden lg:block text-right">
+                <span class="block text-xs uppercase tracking-wider text-green-200 font-bold">System Status</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900 text-green-100 border border-green-500">
+                    <svg class="mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                        <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    Self-Hosted Instance
+                </span>
+            </div>
+
             {% if actors|length > 1 %}
             <form action="/dashboard" method="GET">
                 <label for="actor_switch" class="sr-only">Switch Farm</label>
@@ -67,6 +78,35 @@
     </div>
 </div>
 
+{% if stats.batches_count == 0 %}
+<!-- Zero State Welcome Card -->
+<div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+    <div class="bg-gradient-to-r from-amber-50 to-white p-8 border-b border-gray-100">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2 font-serif">Let's get your records started!</h2>
+        <p class="text-gray-600">You have your farm profile, now it's time to add your first batch. Choose how you want to start:</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+        <div class="p-8 hover:bg-gray-50 transition group cursor-pointer" onclick="window.location='/actors/{{ stats.actor.id }}/batches/new'">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 transition">
+                <span class="text-2xl">✏️</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Start Simple</h3>
+            <p class="text-sm text-gray-500 mb-4">Create your first batch manually. Best for getting a feel for the system.</p>
+            <span class="text-green-700 font-medium text-sm group-hover:underline">Create Manual Batch →</span>
+        </div>
+        
+        <div class="p-8 hover:bg-gray-50 transition group cursor-pointer" onclick="alert('CSV Import coming in next release! For now, please use manual entry.')">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition">
+                <span class="text-2xl">📂</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Import Data</h3>
+            <p class="text-sm text-gray-500 mb-4">Have a spreadsheet? Upload a CSV to bulk-import your existing inventory.</p>
+            <span class="text-blue-700 font-medium text-sm group-hover:underline">Upload CSV →</span>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Alert/Status Section -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     <!-- Alerts -->
@@ -77,9 +117,10 @@
         </h2>
         <div class="space-y-3">
             {% if stats.active_batches == 0 %}
+            <!-- Only show if we didn't show the big card above, or as a persistent reminder -->
             <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
                 <p class="text-blue-800 text-sm">
-                    <strong>Ready to start tracking!</strong> Create your first batch to begin traceability.
+                    <strong>Welcome!</strong> Use the buttons above to add your first batch.
                 </p>
             </div>
             {% endif %}

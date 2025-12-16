@@ -26,7 +26,7 @@ Built by a small producer, tired of spreadsheet hell and enterprise software pri
 
 ### 💡 **Built for Real Farms**
 - **Dogfooded Daily** - Used on an actual farm by actual producers
-- **Producer Economics** - $25/month hosted or free self-hosted
+- **Producer Economics** - $29/mo or $290/yr hosted or free self-hosted
 - **Real Problems Solved** - Organic audits, recall responses, customer transparency
 
 ### ⚡ **Enterprise Features, Producer Prices**
@@ -84,7 +84,7 @@ Field-A-Carrots → Harvest → Wash → Pack → Ship
 ## 🚀 **Get Started Today**
 
 ### 🌐 **VeriBatch Cloud** - Ready in 60 Seconds
-**$25/month • No setup • Automatic updates • Full support**
+**$29/month or $290/year • No setup • Automatic updates • Full support**
 
 1. **Sign up** at [veribatch.cloud](#) *(coming soon)*
 2. **Create your farm profile** - Name, location, certification info
@@ -223,7 +223,7 @@ Result: $18/jar vs. $8 for generic honey
 ## 📁 Project Structure
 
 ```
-OriginStack/                          # Everything you need
+VeriBatch/                          # Everything you need
 ├── backend/
 │   ├── app/
 │   │   ├── api/                     # 📡 REST endpoints (13+ modules)
@@ -436,9 +436,9 @@ curl -X POST http://localhost:8000/api/actors/my-farm/batches \
 
 ### 📞 **Ready to Get Started?**
 
-🌐 **VeriBatch Cloud**: [Sign up for $25/month](mailto:hello@boothfarmenterprises.ca?subject=VeriBatch%20Cloud%20Signup)  
+🌐 **VeriBatch Cloud**: [Sign up for $25/month](mailto:colton@boothfarmenterprises.ca?subject=VeriBatch%20Cloud%20Signup)  
 💻 **Self-Hosted**: Clone from [git.boothfarmenterprises.ca](https://git.boothfarmenterprises.ca/coltonbooth/VeriBatch)  
-🛠️ **Custom Setup**: [Professional installation services available](mailto:hello@boothfarmenterprises.ca?subject=VeriBatch%20Professional%20Setup)  
-💬 **Questions**: [hello@boothfarmenterprises.ca](mailto:hello@boothfarmenterprises.ca)  
+🛠️ **Custom Setup**: [Professional installation services available](mailto:colton@boothfarmenterprises.ca?subject=VeriBatch%20Professional%20Setup)  
+💬 **Questions**: [hello@boothfarmenterprises.ca](mailto:colton@boothfarmenterprises.ca)  
 
 *Built with ❤️ on an actual farm, for actual food producers who deserve better than spreadsheets.*

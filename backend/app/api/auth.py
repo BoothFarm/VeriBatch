@@ -81,8 +81,16 @@ async def register(
     email: str = Form(...),
     password: str = Form(...),
     full_name: str = Form(None),
+    phone_secondary: str = Form(None),
     db: Session = Depends(get_db)
 ):
+    # Honeypot check
+    if phone_secondary:
+        return templates.TemplateResponse("register.html", {
+            "request": request,
+            "error": "Registration failed."
+        })
+
     existing_user = auth_service.get_user_by_email(db, email)
     if existing_user:
         return templates.TemplateResponse("register.html", {

@@ -1,206 +1,105 @@
 # VeriBatch 🥕
 
-**An open, producer-first food traceability platform**
+> **"From the Berry Patch to VeriBatch."**
 
-VeriBatch is an open-source platform for tracking batches, processes, and provenance in food and small-scale manufacturing. It is built on **Open Origin JSON (OOJ)**, an open data specification designed to make traceability practical, portable, and vendor-neutral.
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-00a393?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-336791?style=flat-square&logo=postgresql)](https://postgresql.org)
+[![HTMX](https://img.shields.io/badge/HTMX-1.9-blue?style=flat-square)](https://htmx.org)
+[![License](https://img.shields.io/badge/License-AGPL%20v3-black?style=flat-square)](LICENSE)
 
-VeriBatch exists to replace spreadsheet chaos without replacing your ownership of data.
+**VeriBatch** is the open-source operating system for small farms, food processors, and cottage kitchens.
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-00a393.svg)](https://fastapi.tiangolo.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-336791.svg)](https://postgresql.org)
-[![OOJ](https://img.shields.io/badge/Open_Origin_JSON-v0.5-green.svg)](./Open_Origin_JSON_v0.5.md)
-[![License](https://img.shields.io/badge/License-AGPL%20%2F%20MIT-blue.svg)](LICENSE)
-
----
-
-## What is VeriBatch?
-
-VeriBatch is **production-ready traceability software** designed for:
-
-- Farms and market gardens
-- Food processors and value-added producers
-- Bakeries, fermenters, and small manufacturers
-- Co-ops and shared facilities
-- Consultants supporting regulated food businesses
-
-It models the *actual lifecycle* of food and products: inputs, transformations, losses, splits, merges, and hand-offs between actors.
-
-Unlike traditional systems, VeriBatch treats traceability as **structured data**, not locked-in records.
+We built this because notebooks get lost, spreadsheets get messy, and "Enterprise Traceability" software costs more than your tractor.
 
 ---
 
-## Core Principles
+## 🚜 Who is this for?
 
-### 🧱 Built on an Open Standard
-VeriBatch uses **Open Origin JSON (OOJ v0.5)** as its native data model.
+VeriBatch is designed for the **realities of production**, not just a database admin's fantasy.
 
-This means:
-- Your data is readable JSON
-- You can export everything, at any time
-- Other systems can interoperate without custom adapters
-- Switching tools does not destroy your history
-
-VeriBatch is opinionated software on top of an **unopinionated standard**.
+*   **Farmers & Market Gardeners:** Track harvest lots from field to wash-pack.
+*   **Value-Added Producers:** Trace raw garlic → peeling → pickling → jarring.
+*   **Co-ops & Hubs:** Manage inventory across multiple producers.
+*   **You:** If you've ever spent a Sunday night panic-entering data for an audit.
 
 ---
 
-### 🔓 No Vendor Lock-In
-Most traceability tools trap years of operational history inside proprietary schemas.
+## ✨ Features that actually matter
 
-VeriBatch does the opposite.
+### 🛡️ Sleep-at-Night Compliance
+Audits shouldn't be scary. VeriBatch keeps you "inspection ready" by default.
+*   **One-Click Mock Recalls:** Generate a full downstream report in seconds.
+*   **Audit Logs:** Prove exactly who did what, and when.
+*   **Data Export:** You own your data. Export everything to JSON or CSV instantly.
 
-- All records are stored as OOJ documents
-- JSONB storage preserves structure and flexibility
-- Exports are first-class, not an afterthought
+### 🏷️ Built-in Labeling Engine
+Stop fighting with Word templates.
+*   **Auto-Generated QR Codes:** Let customers scan to see the story behind their food.
+*   **Dynamic Barcodes:** Supports retail UPCs (SCAN) and internal tracking codes (Code 128).
+*   **Print-Ready:** formatted for standard label sizes (4x2", etc.).
 
-If VeriBatch disappeared tomorrow, your data would still make sense.
+### ⚡ The "OmniBar" Search
+Don't dig through menus.
+*   Type `garlic` -> See all garlic batches.
+*   Type `lot-123` -> Jump straight to that batch's history.
+*   Type `planting` -> Find all planting events.
+*   *It just works.*
 
----
-
-### 🌱 Designed for Real Operations
-VeriBatch models things most systems avoid:
-
-- Loss, shrink, spoilage, and disposal
-- Partial batch usage and splits
-- Multi-step processing workflows
-- Cross-actor sourcing and supply chains
-- Human accountability via events and timestamps
-
-If it happens in real production, it belongs in the system.
-
----
-
-## Key Capabilities
-
-- **Batch lifecycle tracking** from input to final sale
-- **Event-based provenance** (processing, transfer, disposal, recall)
-- **Fast full-text search** across batches, items, and events
-- **QR code generation** for public batch verification
-- **Compliance-friendly exports** for audits and inspections
-- **Multi-operation support** within a single instance
-- **API-first design** with auto-generated documentation
+### 🧬 Real-World Modeling
+Food production isn't a straight line. VeriBatch handles the messiness:
+*   **Splits:** Divide one harvest into "Retail", "Wholesale", and "Processing".
+*   **Merges:** Combine three days of picking into one sauce batch.
+*   **Loss:** Track shrink, spoilage, and compost.
 
 ---
 
-## Architecture Overview
+## 🛠️ The "Boring" Stack (That won't break)
 
-VeriBatch uses a modern but intentionally boring stack:
+We use proven, stable technology so you don't have to be a cloud architect to run your farm.
 
-```
-Browser
-  ↓
-HTMX templates (server-rendered, minimal JS)
-  ↓
-FastAPI (typed, async, documented)
-  ↓
-PostgreSQL (JSONB + relational indexes)
-  ↓
-Meilisearch (fast, typo-tolerant search)
-```
-
-Why this matters:
-- Easy to self-host
-- Easy to reason about
-- Easy to extend
-- No frontend framework churn
-- No cloud lock-in assumptions
+*   **Backend:** Python + FastAPI (Robust, fast, type-safe).
+*   **Database:** PostgreSQL (The gold standard for data integrity).
+*   **Frontend:** HTMX + Alpine.js + Tailwind (Fast, lightweight, no massive JavaScript bundles).
+*   **Search:** Meilisearch (Typo-tolerant, instant results).
 
 ---
 
-## Getting Started
+## 🚀 Get Started in 2 Minutes
 
-### Self-Hosted (Recommended for Developers)
+### 1. Installation
 
 ```bash
+# Clone the repo
 git clone https://github.com/BoothFarm/VeriBatch.git
 cd VeriBatch
+
+# Run the all-in-one setup script
 ./setup.sh
 ```
 
-Then open:
-
-```
-http://localhost:8000
-```
-
-You will get:
-- A working web UI
-- Sample data
-- Search enabled
-- API docs available at `/docs`
-
----
-
-### API Access
-
-VeriBatch exposes a full REST API.
+### 2. Launch
 
 ```bash
-http://localhost:8000/docs
+# In backend/
+source venv/bin/activate
+uvicorn app.main:app --reload
 ```
 
-All core actions (actors, items, batches, events) are available via API and map directly to OOJ entities.
+### 3. Organize
+Go to `http://localhost:8000`. You'll see our onboarding wizard:
+1.  Create your **Actor** (Farm/Business profile).
+2.  Define your **Items** (Carrots, Jams, etc.).
+3.  Log your first **Harvest** or **Batch**.
 
 ---
 
-## Relationship to Open Origin JSON
+## 🤝 Open Origin JSON
 
-VeriBatch is the **reference implementation** of the Open Origin JSON specification.
-
-- OOJ is vendor-neutral and independently licensed
-- VeriBatch implements OOJ fully and faithfully
-- Other tools can implement OOJ without using VeriBatch
-- VeriBatch benefits from interoperability as OOJ adoption grows
-
-Think of OOJ as the protocol, VeriBatch as one good client.
+VeriBatch isn't just an app; it's a reference implementation of **Open Origin JSON (OOJ)**. This means your data is stored in a standardized, interoperable format. If you ever outgrow VeriBatch, you can take your data with you—structure and all.
 
 ---
 
-## Who This Is For
-
-VeriBatch is a good fit if you:
-
-- Need traceability but hate spreadsheets
-- Want audit-ready records without enterprise pricing
-- Care about owning your operational data
-- Prefer open systems over black boxes
-- Are a developer, consultant, or technically curious producer
-
-It may *not* be a fit if you want a closed, compliance-only checkbox tool.
-
----
-
-## Documentation
-
-- **GETTING_STARTED.md** – Initial setup and workflow
-- **CAPABILITIES.md** – What is implemented today
-- **Open_Origin_JSON_v0.5.md** – Data specification
-- **LEVEL_2_3_GUIDE.md** – Advanced traceability concepts
-- **PROD_DEPLOYMENT.md** – Production deployment notes
-
----
-
-## Contributing
-
-Contributions are welcome and encouraged.
-
-Especially valuable:
-- Real-world edge cases
-- Additional export formats
-- Frontend usability improvements
-- OOJ client libraries in other languages
-- Documentation clarifications
-
-This project improves fastest when grounded in reality.
-
----
-
-## License
-
-- **VeriBatch software**: Open-source, see LICENSE
-- **Open Origin JSON specification**: CC-BY 4.0
-
----
-
-**Booth Farm Enterprises Ltd.**  
-*Open traceability, without the bullshit.*
+<p align="center">
+  <sub>Built with 💚 by Booth Farm Enterprises.</sub><br>
+  <sub>Licensed under AGPL v3. <i>"Your harvest, your history."</i></sub>
+</p>
